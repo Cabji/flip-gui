@@ -18,13 +18,15 @@ FlipMain::FlipMain(wxWindow* parent, wxWindowID id, const wxString& title, const
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
 
     // // create a FlipProgramLog object which is a child of this (FlipMain)
-    m_programLog = new FlipProgramLog(this);
+    m_programLog = std::make_unique<FlipProgramLog>(this);
+
+    this->SetPosition(this->FromDIP(wxPoint(100,100)));
+    this->SetSize(this->FromDIP(wxSize(400,300)));
 }
 
 FlipMain::~FlipMain()
 {
     // destructor
-    delete m_programLog;
 }
 
 void FlipMain::OnAbout(wxCommandEvent& event)

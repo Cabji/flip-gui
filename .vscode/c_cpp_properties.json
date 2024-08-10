@@ -5,8 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/cpp/cppLibraries/wxWidgets_static/lib/gcc_x64_lib/mswu",
-                "C:/cpp/cppLibraries/wxWidgets_static/include", 
-                "C:/cpp/github/wxWidgetTest/wxFB/oc"
+                "C:/cpp/cppLibraries/wxWidgets_static/include" 
             ],  
             "defines": [
                 "_WINDOWS",

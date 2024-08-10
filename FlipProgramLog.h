@@ -19,7 +19,9 @@ class FlipProgramLog : public ProgramLog
 	//// end generated class members
 
 	// custom added members and methods
+	static wxString timeNow();
 	void LogMessage(const wxString& message);
+	static void LogMessage(const wxString& message, FlipProgramLog& targetWidget);
 	void OnClose(wxCloseEvent& event);
 
 

@@ -32,10 +32,12 @@ class FlipMain : public Main
 	// custom class members are below here
 	private:
 		void OnAbout(wxCommandEvent& event);
+		void OnChoice(wxCommandEvent& event);
 		void OnQuit(wxCommandEvent& event);
 		void OnShowProgramLog(wxCommandEvent& event);
 
 		std::unique_ptr<FlipProgramLog> m_programLog;
+		TemplateMap m_tmap_userTemplates;
 };
 
 #endif // __FlipMain__

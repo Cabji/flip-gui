@@ -18,6 +18,8 @@
 #include <wx/settings.h>
 #include <wx/filepicker.h>
 #include <wx/checkbox.h>
+#include <wx/textctrl.h>
+#include <wx/gbsizer.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/choice.h>
@@ -25,11 +27,9 @@
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
-#include <wx/gbsizer.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>
 #include <wx/frame.h>
-#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -50,23 +50,26 @@ class Main : public wxFrame
 			ID_MENU_LOG_PROGRAMLOG,
 		};
 
-		wxStaticText* wxst_lblInput;
-		wxFilePickerCtrl* wxfpicker_inputFile;
-		wxCheckBox* wxcBox_switchDBP;
-		wxCheckBox* wxcBox_switchSWS;
-		wxStaticText* wxst_lblOutput;
-		wxFilePickerCtrl* wxfPicker_outputFile;
-		wxChoice* wxchoice_useTemplate;
-		wxStaticText* wxst_lblUseTemplate;
-		wxButton* wxbtn_Launch;
-		wxMenuBar* wx_menubar_mainFrame;
+		wxGridBagSizer* m_mainFrameSizer;
+		wxStaticText* m_lblInput;
+		wxFilePickerCtrl* m_inputFile;
+		wxCheckBox* m_switchDBP;
+		wxCheckBox* m_switchSWS;
+		wxStaticText* m_lblProcessPages;
+		wxTextCtrl* m_ProcessPages;
+		wxStaticText* m_lblOutput;
+		wxFilePickerCtrl* m_outputFile;
+		wxChoice* m_useTemplate;
+		wxStaticText* m_lblUseTemplate;
+		wxButton* m_btnLaunch;
+		wxMenuBar* m_menuBar;
 		wxMenu* wxMenu_File;
 		wxMenu* wxMenu_Log;
-		wxStatusBar* m_statusBar1;
+		wxStatusBar* m_statusBar;
 
 	public:
 
-		Main( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 373,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		Main( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 410,339 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~Main();
 

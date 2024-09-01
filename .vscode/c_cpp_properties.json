@@ -5,8 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/cpp/cppLibraries/wxWidgets_static/lib/gcc_x64_lib/mswu",
-                "C:/cpp/cppLibraries/wxWidgets_static/include" 
-            ],  
+                "C:/cpp/cppLibraries/wxWidgets_static/include"
+            ],
             "defines": [
                 "_WINDOWS",
                 "_UNICODE",
@@ -17,20 +17,21 @@
             "compilerPath": "c:/cpp/msys64/ucrt64/bin/g++.exe",
             "cStandard": "c11",
             "cppStandard": "c++20",
-            "intelliSenseMode": "gcc-x86"
+            "intelliSenseMode": "gcc-x86",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/dep/mac/mac_lib/lib/wx/include/osx_cocoa-unicode-static-3.2",
-                "${workspaceFolder}/dep/mac/include"                
+                "${workspaceFolder}/dep/mac/include"
             ],
             "defines": [
                 "WX_PRECOMP",
                 "__WXOSX_COCOA__",
                 "_FILE_OFFSET_BITS=64",
-                "__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1"                
+                "__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1"
             ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
@@ -38,12 +39,12 @@
             "intelliSenseMode": "clang-x86"
         },
         {
-            "name": "Linux",            
+            "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/dep/linux/linux_lib/lib/wx/include/gtk3-unicode-static-3.2",
-                "${workspaceFolder}/dep/linux/include"           
-            ],            
+                "${workspaceFolder}/dep/linux/include"
+            ],
             "defines": [
                 "WX_PRECOMP",
                 "__WXGTK__",
@@ -57,26 +58,3 @@
     ],
     "version": 4
 }
-
-// {
-//     "version": 4,
-//     "configurations": [
-//         {
-//             "name": "Win32",
-//             "includePath": [
-//                 "${workspaceFolder}/**",
-//                 "C:/cpp/cppLibraries/wxWidgets/build/lib/gcc_x64_dll/mswu",
-//                 "C:/cpp/cppLibraries/wxWidgets/include"
-//             ],
-//             "defines": [
-//                 "_FILE_OFFSET_BITS=64",
-//                 "WXUSINGDLL",
-//                 "__WXMSW__"
-//             ],
-//             "compilerPath": "C:/cpp/msys64/ucrt64/bin/g++.exe",
-//             "cStandard": "c11",
-//             "cppStandard": "c++20",
-//             "intelliSenseMode": "gcc-x64"
-//         }
-//     ]
-// }

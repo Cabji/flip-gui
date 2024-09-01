@@ -25,4 +25,15 @@ add_executable(FlipApp
 
 target_include_directories(FlipApp PRIVATE ${wxWidgets_INCLUDE_DIRS})
 
-target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES})
+target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES} Dwmapi)
+
+
+# Assuming you are using MSYS2/MinGW or Visual Studio:
+if (WIN32)
+    add_custom_command(TARGET FlipApp POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E
+            env "PATH=$ENV{PATH}"
+            mt.exe -manifest \"${CMAKE_SOURCE_DIR}/app.manifest\" -outputresource:\"$<TARGET_FILE:FlipApp>\";
+        COMMENT "Embedding manifest..."
+    )
+endif()

@@ -100,28 +100,37 @@ Main::Main( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoin
 	this->SetSizer( m_mainFrameSizer );
 	this->Layout();
 	m_menuBar = new wxMenuBar( 0 );
-	wxMenu_File = new wxMenu();
-	wxMenuItem* wxMenuItem_fileAbout;
-	wxMenuItem_fileAbout = new wxMenuItem( wxMenu_File, ID_MENU_FILE_ABOUT, wxString( _("About") ) , wxEmptyString, wxITEM_NORMAL );
-	wxMenu_File->Append( wxMenuItem_fileAbout );
-
-	wxMenuItem* wxMenuItem_fileQuit;
-	wxMenuItem_fileQuit = new wxMenuItem( wxMenu_File, ID_MENU_FILE_QUIT, wxString( _("Quit") ) , wxEmptyString, wxITEM_NORMAL );
-	wxMenu_File->Append( wxMenuItem_fileQuit );
-
-	m_menuBar->Append( wxMenu_File, _("File") );
-
-	wxMenu_Log = new wxMenu();
-	wxMenuItem* wxMenuItem_logProgramLog;
-	wxMenuItem_logProgramLog = new wxMenuItem( wxMenu_Log, ID_MENU_LOG_PROGRAMLOG, wxString( _("Program Log") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuFile = new wxMenu();
+	wxMenuItem* m_menuFile_About;
+	m_menuFile_About = new wxMenuItem( m_menuFile, ID_MENU_FILE_ABOUT, wxString( _("About") ) + wxT('\t') + wxT("Ctrl+I"), _("Show information about program"), wxITEM_NORMAL );
 	#ifdef __WXMSW__
-	wxMenuItem_logProgramLog->SetBitmaps( wxNullBitmap );
+	m_menuFile_About->SetBitmaps( wxNullBitmap );
 	#elif (defined( __WXGTK__ ) || defined( __WXOSX__ ))
-	wxMenuItem_logProgramLog->SetBitmap( wxNullBitmap );
+	m_menuFile_About->SetBitmap( wxNullBitmap );
 	#endif
-	wxMenu_Log->Append( wxMenuItem_logProgramLog );
+	m_menuFile->Append( m_menuFile_About );
 
-	m_menuBar->Append( wxMenu_Log, _("Log") );
+	wxMenuItem* m_menuFile_TemplateEditor;
+	m_menuFile_TemplateEditor = new wxMenuItem( m_menuFile, ID_MENU_FILE_TEMPLATEEDITOR, wxString( _("Template Editor") ) + wxT('\t') + wxT("Ctrl+T"), _("Open the Template Editor"), wxITEM_NORMAL );
+	m_menuFile->Append( m_menuFile_TemplateEditor );
+
+	wxMenuItem* m_menuFile_Quit;
+	m_menuFile_Quit = new wxMenuItem( m_menuFile, ID_MENU_FILE_QUIT, wxString( _("Quit") ) + wxT('\t') + wxT("Ctrl+Q"), _("Quit the program"), wxITEM_NORMAL );
+	m_menuFile->Append( m_menuFile_Quit );
+
+	m_menuBar->Append( m_menuFile, _("File") );
+
+	m_menuLog = new wxMenu();
+	wxMenuItem* m_menuLog_ProgramLog;
+	m_menuLog_ProgramLog = new wxMenuItem( m_menuLog, ID_MENU_LOG_PROGRAMLOG, wxString( _("Program Log") ) + wxT('\t') + wxT("Ctrl+L"), _("Opens the Program Log"), wxITEM_NORMAL );
+	#ifdef __WXMSW__
+	m_menuLog_ProgramLog->SetBitmaps( wxNullBitmap );
+	#elif (defined( __WXGTK__ ) || defined( __WXOSX__ ))
+	m_menuLog_ProgramLog->SetBitmap( wxNullBitmap );
+	#endif
+	m_menuLog->Append( m_menuLog_ProgramLog );
+
+	m_menuBar->Append( m_menuLog, _("Log") );
 
 	this->SetMenuBar( m_menuBar );
 
@@ -159,5 +168,44 @@ ProgramLog::ProgramLog( wxWindow* parent, wxWindowID id, const wxString& title, 
 }
 
 ProgramLog::~ProgramLog()
+{
+}
+
+TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+
+	wxGridBagSizer* m_templateEditorSizer;
+	m_templateEditorSizer = new wxGridBagSizer( 0, 0 );
+	m_templateEditorSizer->SetFlexibleDirection( wxBOTH );
+	m_templateEditorSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_btnTemplateAdd = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_templateEditorSizer->Add( m_btnTemplateAdd, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL, 5 );
+
+	wxArrayString m_templatesExistingChoices;
+	m_templatesExisting = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_templatesExistingChoices, 0 );
+	m_templatesExisting->SetSelection( 0 );
+	m_templateEditorSizer->Add( m_templatesExisting, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+	m_btnTemplateRemove = new wxButton( this, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_templateEditorSizer->Add( m_btnTemplateRemove, wxGBPosition( 0, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
+
+	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
+	m_textCtrl3->SetFont( wxFont( 9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Fixedsys") ) );
+	m_textCtrl3->SetMinSize( wxSize( -1,150 ) );
+
+	m_templateEditorSizer->Add( m_textCtrl3, wxGBPosition( 1, 0 ), wxGBSpan( 1, 3 ), wxALL|wxEXPAND, 5 );
+
+
+	m_templateEditorSizer->AddGrowableCol( 1 );
+
+	this->SetSizer( m_templateEditorSizer );
+	this->Layout();
+
+	this->Centre( wxBOTH );
+}
+
+TemplateEditor::~TemplateEditor()
 {
 }

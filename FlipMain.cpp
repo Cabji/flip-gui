@@ -1,21 +1,25 @@
 #include "FlipMain.h"
+#include "FlipProgramLog.h"
+#include <wx/bitmap.h>
+#include <wx/bmpbndl.h>
+#include <wx/datetime.h>
+#include <wx/dir.h>
+#include <wx/msgdlg.h>
 
 FlipMain::FlipMain(wxWindow *parent)
     : Main(parent)
 {
 }
-#include <wx/msgdlg.h>
-#include <wx/dir.h>
-#include <wx/datetime.h>
-#include "FlipProgramLog.h"
 
 FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) : Main(parent)
 {
     this->SetSizerAndFit(this->m_mainFrameSizer);
+    this->SetupMenuIcons();
     // create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);
     m_programLog->LogMessage("Program started.");
-
+    // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
+    m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
     // custom constructor
     // event handler binds - menus
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
@@ -74,6 +78,18 @@ TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
     return returnVals;
 }
 
+void FlipMain::SetupMenuIcons()
+{
+    // Load the bitmap from your resources folder
+    wxBitmapBundle openIcon = wxBitmapBundle::FromBitmap(wxBitmap("resources/images/fileAbout.png", wxBITMAP_TYPE_PNG));
+
+    // Assuming m_menuItemOpen is the ID or pointer from wxFormBuilder
+    wxMenuItem *openItem = m_menuFile->FindItem(ID_MENU_FILE_ABOUT); // Get the menu item created in wxFormBuilder
+    if (openItem)
+    {
+        openItem->SetBitmap(openIcon); // Assign the bitmap to the menu item
+    }
+}
 void FlipMain::LogAllChildWidgets()
 {
     // Get the main frame's top-level window

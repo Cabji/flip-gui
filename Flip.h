@@ -46,6 +46,7 @@ class Main : public wxFrame
 			ID_FLP_INPUTFILE = 6000,
 			ID_FLP_OUTPUTFILE,
 			ID_MENU_FILE_ABOUT,
+			ID_MENU_FILE_TEMPLATEEDITOR,
 			ID_MENU_FILE_QUIT,
 			ID_MENU_LOG_PROGRAMLOG,
 		};
@@ -63,8 +64,8 @@ class Main : public wxFrame
 		wxStaticText* m_lblUseTemplate;
 		wxButton* m_btnLaunch;
 		wxMenuBar* m_menuBar;
-		wxMenu* wxMenu_File;
-		wxMenu* wxMenu_Log;
+		wxMenu* m_menuFile;
+		wxMenu* m_menuLog;
 		wxStatusBar* m_statusBar;
 
 	public:
@@ -87,9 +88,30 @@ class ProgramLog : public wxFrame
 
 	public:
 
-		ProgramLog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Program Log"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		ProgramLog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Program Log"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~ProgramLog();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class TemplateEditor
+///////////////////////////////////////////////////////////////////////////////
+class TemplateEditor : public wxFrame
+{
+	private:
+
+	protected:
+		wxButton* m_btnTemplateAdd;
+		wxChoice* m_templatesExisting;
+		wxButton* m_btnTemplateRemove;
+		wxTextCtrl* m_textCtrl3;
+
+	public:
+
+		TemplateEditor( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Template Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+
+		~TemplateEditor();
 
 };
 

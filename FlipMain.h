@@ -37,6 +37,9 @@ public:
 	void LogAllChildWidgets();
 	void LogChildWidgetsRecursive(wxWindow *parent);
 
+	// public members
+	static const wxString RESOURCE_MENU_ICONS_PATH;
+
 	// custom class members are below here
 private:
 	// event handlers
@@ -46,6 +49,7 @@ private:
 	void OnChoice(wxCommandEvent &event);
 	void OnQuit(wxCommandEvent &event);
 	void OnShowProgramLog(wxCommandEvent &event);
+	void OnShowTemplateEditor(wxCommandEvent &event);
 	void OnSwitchDBPChecked(wxCommandEvent &event);
 
 	// private members
@@ -54,7 +58,7 @@ private:
 	TemplateMap m_tmap_userTemplates;
 
 	// private methods
-	void SetupMenuIcons();
+	void SetupMenuIcons(wxMenu *menu);
 };
 
 #endif // __FlipMain__

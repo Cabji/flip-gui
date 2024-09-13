@@ -8,6 +8,9 @@
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 
+// dev-note: if you add resource const values, ensure they prepend with leading / char
+const wxString FlipMain::RESOURCE_MENU_ICONS_PATH = wxT("/resources/images/menuIcons");
+
 FlipMain::FlipMain(wxWindow *parent)
     : Main(parent)
 {
@@ -15,20 +18,23 @@ FlipMain::FlipMain(wxWindow *parent)
 
 FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) : Main(parent)
 {
-    this->SetSizerAndFit(this->m_mainFrameSizer);
-    this->SetupMenuIcons();
+    // custom constructor
+
     //  create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);
     m_programLog->LogMessage("Program started.");
+    this->SetSizerAndFit(this->m_mainFrameSizer);
+    this->SetupMenuIcons(this->m_menuFile);
     // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
-    // custom constructor
+
     // event handler binds - menus
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
     m_btnLaunch->Bind(wxEVT_ENTER_WINDOW, &FlipMain::OnButtonHover, this);
     m_btnLaunch->Bind(wxEVT_LEAVE_WINDOW, &FlipMain::OnButtonLeave, this);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
+    Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
     Bind(wxEVT_CHOICE, &FlipMain::OnChoice, this);
 
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
@@ -80,61 +86,63 @@ TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
     return returnVals;
 }
 
-void FlipMain::SetupMenuIcons()
+void FlipMain::SetupMenuIcons(wxMenu *menu)
 {
-    std::cout << "We are in SetupMenuIcons" << std::endl;
+
     // Define the folder containing your menu icons, set to the relative path from the executable location
-    wxString iconFolderPath = wxStandardPaths::Get().GetExecutablePath();
-    iconFolderPath = wxPathOnly(iconFolderPath) + "/resources/images/menuIcons/";
+    wxString iconFolderPath = wxGetCwd() + RESOURCE_MENU_ICONS_PATH;
+    // change all becksleshes to sleshes
+    iconFolderPath.Replace("\\", "/");
 
     // Ensure the directory exists and is accessible
     wxDir iconDir(iconFolderPath);
     if (!iconDir.IsOpened())
     {
+        std::cout << "Can't access icon images directory: " << iconFolderPath << std::endl;
         m_programLog->LogMessage(wxString::Format("Failed to open directory: %s", iconFolderPath));
         return;
     }
 
-    // Prepare variables to hold file names
-    wxString fileName;
-    bool hasMoreFiles = iconDir.GetFirst(&fileName, "*.png", wxDIR_FILES);
-
-    // Loop over all PNG files in the directory
-    while (hasMoreFiles)
+    // Attempt to get the menu title; abandon process if unavailable
+    wxString parentMenuName = menu->GetTitle().Lower(); // Try to get the menu title
+    if (parentMenuName.IsEmpty())
     {
-        // Extract the base name of the file (without extension) and convert to integer ID
-        wxString itemIDStr = wxFileName(fileName).GetName();
-        long itemID;
-        if (!itemIDStr.ToLong(&itemID))
+        m_programLog->LogMessage("Warning: Parent menu name could not be retrieved. Abandoning process.");
+        return;
+    }
+
+    // Iterate over all menu items in the given menu
+    for (size_t i = 0; i < menu->GetMenuItemCount(); ++i)
+    {
+        wxMenuItem *menuItem = menu->FindItemByPosition(i);
+        if (!menuItem)
+            continue;
+
+        // Extract the label and format it to match the expected icon filename
+        wxString label = parentMenuName + "_" + menuItem->GetItemLabelText().Lower(); // Lowercase for consistency
+        label.Replace(" ", "_");                                                      // Replace spaces with underscores to match file naming convention
+
+        // Construct the full path to the expected icon file
+        wxString iconPath = iconFolderPath + "/" + label + ".png";
+
+        // Check if the icon file exists
+        if (!wxFileExists(iconPath))
         {
-            m_programLog->LogMessage(wxString::Format("Invalid ID format in file: %s", fileName));
-            hasMoreFiles = iconDir.GetNext(&fileName);
+            m_programLog->LogMessage(wxString::Format("Icon file not found for menu item: %s; iconPath: %s", label, iconPath));
             continue;
         }
 
-        // Load the bitmap from the file
-        wxString fullPath = iconFolderPath + fileName;
-        wxBitmapBundle iconBundle = wxBitmapBundle::FromBitmap(wxBitmap(fullPath, wxBITMAP_TYPE_PNG));
-        if (!iconBundle.IsOk())
-        {
-            m_programLog->LogMessage(wxString::Format("Failed to load bitmap: %s", fullPath));
-            hasMoreFiles = iconDir.GetNext(&fileName);
-            continue;
-        }
-
-        // Get the corresponding menu item by its ID
-        wxMenuItem *menuItem = m_menuFile->FindItem(static_cast<int>(itemID));
-        if (menuItem)
+        // Load the icon as a wxBitmapBundle and apply it to the menu item
+        wxBitmapBundle iconBundle = wxBitmapBundle::FromBitmap(wxBitmap(iconPath, wxBITMAP_TYPE_PNG));
+        if (iconBundle.IsOk())
         {
             menuItem->SetBitmap(iconBundle); // Assign the icon to the menu item
+            m_programLog->LogMessage(wxString::Format("Applied icon: %s to menu item: %s", iconPath, label));
         }
         else
         {
-            m_programLog->LogMessage(wxString::Format("Menu item not found for ID: %d", static_cast<int>(itemID)));
+            m_programLog->LogMessage(wxString::Format("Failed to load bitmap: %s", iconPath));
         }
-
-        // Move to the next file
-        hasMoreFiles = iconDir.GetNext(&fileName);
     }
 }
 
@@ -214,7 +222,17 @@ void FlipMain::OnShowProgramLog(wxCommandEvent &event)
 {
     if (m_programLog)
     {
+        std::cout << "Showing Program Log window" << std::endl;
         m_programLog->Show(true);
+    }
+}
+
+void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
+{
+    if (m_templateEditor)
+    {
+        std::cout << "Showing Template Editor window" << std::endl;
+        m_templateEditor->Show(true);
     }
 }
 

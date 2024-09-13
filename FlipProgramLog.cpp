@@ -1,8 +1,7 @@
 #include "FlipProgramLog.h"
 
-FlipProgramLog::FlipProgramLog( wxWindow* parent )
-:
-ProgramLog( parent )
+FlipProgramLog::FlipProgramLog(wxWindow *parent)
+    : ProgramLog(parent)
 {
     Bind(wxEVT_CLOSE_WINDOW, &FlipProgramLog::OnClose, this);
 }
@@ -18,16 +17,20 @@ void FlipProgramLog::LogMessage(const wxString &message)
     this->wxtextCtrl_programLog->AppendText("[" + timeNow() + "] " + message + "\n");
 }
 
-void FlipProgramLog::LogMessage(const wxString &message, FlipProgramLog &targetWidget) {
+void FlipProgramLog::LogMessage(const wxString &message, FlipProgramLog &targetWidget)
+{
     // Cast targetWidget to FlipProgramLog to access the inherited wxTextCtrl
-    FlipProgramLog* logFrame = static_cast<FlipProgramLog*>(&targetWidget);
+    FlipProgramLog *logFrame = static_cast<FlipProgramLog *>(&targetWidget);
 
     // Assuming the wxTextCtrl is named `wxtextCtrl_programLog` in the generated ProgramLog class
-    if (logFrame->wxtextCtrl_programLog) {
+    if (logFrame->wxtextCtrl_programLog)
+    {
         logFrame->wxtextCtrl_programLog->AppendText("[" + FlipProgramLog::timeNow() + "] " + message + "\n");
     }
 }
 
-void FlipProgramLog::OnClose(wxCloseEvent& event) {
-    Hide();  // Hide the frame instead of closing it
+void FlipProgramLog::OnClose(wxCloseEvent &event)
+{
+    std::cout << "Hiding Program Log window" << std::endl;
+    Hide(); // Hide the frame instead of closing it
 }

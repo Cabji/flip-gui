@@ -25,8 +25,6 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     m_programLog->LogMessage("Program started.");
     this->SetSizerAndFit(this->m_mainFrameSizer);
     this->SetupMenuIcons(this->m_menuFile);
-    // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
-    m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
 
     // event handler binds - menus
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
@@ -60,6 +58,9 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     }
     this->SetPosition(this->FromDIP(wxPoint(100, 100)));
     this->SetSize(this->FromDIP(wxSize(400, 300)));
+
+    // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
+    m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
 }
 
 FlipMain::~FlipMain()

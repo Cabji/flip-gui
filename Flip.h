@@ -60,7 +60,6 @@ class Main : public wxFrame
 		wxTextCtrl* m_ProcessPages;
 		wxStaticText* m_lblOutput;
 		wxFilePickerCtrl* m_outputFile;
-		wxChoice* m_useTemplate;
 		wxStaticText* m_lblUseTemplate;
 		wxButton* m_btnLaunch;
 		wxMenuBar* m_menuBar;
@@ -69,6 +68,7 @@ class Main : public wxFrame
 		wxStatusBar* m_statusBar;
 
 	public:
+		wxChoice* m_useTemplate;
 
 		Main( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 410,339 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 

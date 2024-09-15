@@ -1,5 +1,6 @@
 #include "FlipMain.h"
 #include "FlipProgramLog.h"
+#include "FlipTemplateEditor.h"
 #include <wx/bitmap.h>
 #include <wx/bmpbndl.h>
 #include <wx/datetime.h>
@@ -7,6 +8,9 @@
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
+
+// define custom events
+wxDEFINE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
 
 // dev-note: if you add resource const values, ensure they prepend with leading / char
 const wxString FlipMain::RESOURCE_MENU_ICONS_PATH = wxT("/resources/images/menuIcons");
@@ -40,12 +44,12 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     // example of static call to LogMessage:
     // FlipProgramLog::LogMessage("This is a test.", *m_programLog);
 
-    wxArrayString m_configTemplatePaths;
-    m_configTemplatePaths.Add(wxGetHomeDir() + "/.flip/templates");
-    m_configTemplatePaths.Add("./templates");
+    wxArrayString configTemplatePaths;
+    configTemplatePaths.Add(wxGetHomeDir() + "/.flip/templates");
+    configTemplatePaths.Add("./templates");
 
     FlipProgramLog::LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates", *m_programLog);
-    m_tmap_userTemplates = ReadUserTemplates(m_configTemplatePaths);
+    m_tmap_userTemplates = ReadUserTemplates(configTemplatePaths);
     // loop the template values we got
     for (const auto &templatePath : m_tmap_userTemplates)
     {
@@ -61,6 +65,10 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
 
     // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
+
+    // Trigger the event to notify FlipTemplateEditor about the change
+    wxCommandEvent event(EVT_TEMPLATE_LIST_UPDATED);
+    wxPostEvent(this, event);
 }
 
 FlipMain::~FlipMain()

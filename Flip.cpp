@@ -181,21 +181,28 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 	m_templateEditorSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
 	m_btnTemplateAdd = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_templateEditorSizer->Add( m_btnTemplateAdd, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL, 5 );
+	m_templateEditorSizer->Add( m_btnTemplateAdd, wxGBPosition( 0, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 
 	wxArrayString m_templatesExistingChoices;
 	m_templatesExisting = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_templatesExistingChoices, 0 );
 	m_templatesExisting->SetSelection( 0 );
-	m_templateEditorSizer->Add( m_templatesExisting, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	m_templateEditorSizer->Add( m_templatesExisting, wxGBPosition( 1, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
 	m_btnTemplateRemove = new wxButton( this, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_templateEditorSizer->Add( m_btnTemplateRemove, wxGBPosition( 0, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
+	m_templateEditorSizer->Add( m_btnTemplateRemove, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 
-	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
-	m_textCtrl3->SetFont( wxFont( 9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Fixedsys") ) );
-	m_textCtrl3->SetMinSize( wxSize( -1,150 ) );
+	m_templateEditor = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
+	m_templateEditor->SetFont( wxFont( 9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Fixedsys") ) );
+	m_templateEditor->SetMinSize( wxSize( -1,150 ) );
 
-	m_templateEditorSizer->Add( m_textCtrl3, wxGBPosition( 1, 0 ), wxGBSpan( 1, 3 ), wxALL|wxEXPAND, 5 );
+	m_templateEditorSizer->Add( m_templateEditor, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxEXPAND, 5 );
+
+	m_lblAddTemplate = new wxStaticText( this, wxID_ANY, _("New Template: "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_lblAddTemplate->Wrap( -1 );
+	m_templateEditorSizer->Add( m_lblAddTemplate, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER|wxALL, 5 );
+
+	m_AddTemplate = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_templateEditorSizer->Add( m_AddTemplate, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
 
 	m_templateEditorSizer->AddGrowableCol( 1 );

@@ -100,16 +100,18 @@ class ProgramLog : public wxFrame
 class TemplateEditor : public wxFrame
 {
 	private:
+		wxChoice* m_templatesExisting;
 
 	protected:
 		wxButton* m_btnTemplateAdd;
-		wxChoice* m_templatesExisting;
 		wxButton* m_btnTemplateRemove;
-		wxTextCtrl* m_textCtrl3;
+		wxTextCtrl* m_templateEditor;
+		wxStaticText* m_lblAddTemplate;
+		wxTextCtrl* m_AddTemplate;
 
 	public:
 
-		TemplateEditor( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Template Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		TemplateEditor( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Template Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 456,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~TemplateEditor();
 

@@ -16,7 +16,7 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 	m_wxChoice_Templates = parent->m_useTemplate;
 	// bind event handlers
 	Bind(wxEVT_CLOSE_WINDOW, &FlipTemplateEditor::OnClose, this);
-	Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnAddTemplate, this);
+	m_btnAddTemplate->Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnAddTemplate, this);
 	m_templatesExisting->Bind(wxEVT_CHOICE, &FlipTemplateEditor::OnTemplateChoiceChanged, this);
 	parent->Bind(EVT_TEMPLATE_LIST_UPDATED, &FlipTemplateEditor::OnTemplateListUpdated, this);
 

@@ -33,13 +33,13 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     this->SetSizerAndFit(this->m_mainFrameSizer);
     this->SetupMenuIcons(this->m_menuFile);
 
-    // event handler binds - menus
+    // event handler binds
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
-    Bind(wxEVT_CHOICE, &FlipMain::OnChoice, this);
-
+    // spcific widget binds
+    m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnChoice, this);
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
 
     // example of static call to LogMessage:

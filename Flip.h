@@ -105,7 +105,7 @@ class TemplateEditor : public wxFrame
 		wxFilePickerCtrl* m_filePickerAddNew;
 		wxButton* m_btnAddTemplate;
 		wxChoice* m_templatesExisting;
-		wxButton* m_btnTemplateRemove;
+		wxButton* m_btnRemoveTemplate;
 		wxTextCtrl* m_templateEditor;
 		wxStatusBar* m_templateEditorStatusBar;
 

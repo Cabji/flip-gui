@@ -27,13 +27,14 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     //  create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);
     m_programLog->LogMessage("Program started.");
+    // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
+    m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
+
     this->SetSizerAndFit(this->m_mainFrameSizer);
     this->SetupMenuIcons(this->m_menuFile);
 
     // event handler binds - menus
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
-    m_btnLaunch->Bind(wxEVT_ENTER_WINDOW, &FlipMain::OnButtonHover, this);
-    m_btnLaunch->Bind(wxEVT_LEAVE_WINDOW, &FlipMain::OnButtonLeave, this);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
@@ -62,9 +63,6 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     }
     this->SetPosition(this->FromDIP(wxPoint(100, 100)));
     this->SetSize(this->FromDIP(wxSize(400, 300)));
-
-    // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
-    m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
 
     // Trigger the event to notify FlipTemplateEditor about the change
     wxCommandEvent event(EVT_TEMPLATE_LIST_UPDATED);
@@ -216,7 +214,6 @@ void FlipMain::OnChoice(wxCommandEvent &event)
     {
         choice->SetToolTip(m_tmap_userTemplates[choice->GetStringSelection()]);
         FlipProgramLog::LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")", *m_programLog);
-        //     choice->SetToolTip(this->m_tmap);
     }
 
     event.Skip(); // Call this to allow other event handlers to process this event
@@ -257,14 +254,4 @@ void FlipMain::OnSwitchDBPChecked(wxCommandEvent &event)
     FlipProgramLog::LogMessage("Parent class name: " + parentClassName, *m_programLog);
 
     // Continue with other logic if needed...
-}
-
-void FlipMain::OnButtonHover(wxMouseEvent &event)
-{
-    event.Skip();
-}
-
-void FlipMain::OnButtonLeave(wxMouseEvent &event)
-{
-    event.Skip();
 }

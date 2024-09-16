@@ -3,10 +3,8 @@
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 
-FlipTemplateEditor::FlipTemplateEditor(wxWindow *parent)
-	: TemplateEditor(parent),
-	  m_parent(dynamic_cast<FlipMain *>(parent)),
-	  m_existingTemplates(m_parent ? m_parent->m_useTemplate : nullptr)
+FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
+	: TemplateEditor(parent)
 {
 	// dev-note: m_existingTemplates points to -> FlipMain::m_useTemplate which is
 	//			 inherited from -> Flip base class. m_useTemplates is defined as a
@@ -15,32 +13,27 @@ FlipTemplateEditor::FlipTemplateEditor(wxWindow *parent)
 	//			 m_existingTemplates hides the wxChoice member in the base class and is
 	//			 a pointer in FlipTemplateEditor.
 
-	// check that we got the parent object on construction
-	// if (!m_parent)
-	// {
-	// 	// 	// output error msg to console (use --console when running program to see console messages)
-	// 	std::cout << "Parent is not FlipMain, casting failed." << std::endl;
-	// 	// 	return;
-	// }
-
+	m_wxChoice_Templates = parent->m_useTemplate;
 	// bind event handlers
 	Bind(wxEVT_CLOSE_WINDOW, &FlipTemplateEditor::OnClose, this);
-	// m_existingTemplates->Bind(wxEVT_CHOICE, &FlipTemplateEditor::OnTemplateChanged, this);
-	// m_parent->Bind(EVT_TEMPLATE_LIST_UPDATED, &FlipTemplateEditor::OnTemplateListUpdated, this);
+	Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnAddTemplate, this);
+	m_templatesExisting->Bind(wxEVT_CHOICE, &FlipTemplateEditor::OnTemplateChoiceChanged, this);
+	parent->Bind(EVT_TEMPLATE_LIST_UPDATED, &FlipTemplateEditor::OnTemplateListUpdated, this);
 
 	// f0rce an OnTemplateChange event to update the m_existingTemplates object
-	// wxCommandEvent event;
+	wxCommandEvent event;
 	// OnTemplateChanged(event);
 }
 
-void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
+void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 {
-	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
-	// m_existingTemplates->Clear();
-	// for (size_t i = 0; i < m_parent->m_useTemplate->GetCount(); ++i)
-	// {
-	// 	m_existingTemplates->Append(m_parent->m_useTemplate->GetString(i));
-	// }
+	// get filename info from m_filePickerAddNew
+	wxString target = m_filePickerAddNew->GetTextCtrlValue();
+	if (!target)
+	{
+		// we didn't get anything from the file picker control
+	}
+	std::cout << "Well it seems like the file picker wants to make a file at: " << target << std::endl;
 }
 
 void FlipTemplateEditor::OnClose(wxCloseEvent &event)
@@ -49,46 +42,62 @@ void FlipTemplateEditor::OnClose(wxCloseEvent &event)
 	Hide(); // Hide the frame instead of closing it
 }
 
-void FlipTemplateEditor::OnTemplateChanged(wxCommandEvent &event)
+void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 {
+	std::cout << "Template Choice in Template Editor changed" << std::endl;
 	// get the selectionIndex of the wxChoice widget
-	// int selectionIndex = m_existingTemplates->GetSelection();
-	// if (selectionIndex == wxNOT_FOUND)
-	// {
-	// 	// No valid selection, so exit
-	// 	return;
-	// }
+	int selectionIndex = m_templatesExisting->GetSelection();
+	if (selectionIndex == wxNOT_FOUND)
+	{
+		// No valid selection, so exit
+		return;
+	}
 
 	// // Get the selected template name
-	// wxString selectedTemplateName = m_existingTemplates->GetString(selectionIndex);
+	wxString selectedTemplateName = m_templatesExisting->GetString(selectionIndex);
 
-	// // Look up the corresponding file path in the m_tmap_userTemplates map
-	// wxString selectedTemplatePath = ((FlipMain *)m_parent)->m_tmap_userTemplates[selectedTemplateName];
+	// Look up the corresponding file path in the m_tmap_userTemplates map
+	wxString selectedTemplatePath = ((FlipMain *)m_parent)->m_tmap_userTemplates[selectedTemplateName];
+	std::cout << "Select template path: " << selectedTemplatePath << std::endl;
 
-	// // Check if the file exists
-	// if (!wxFile::Exists(selectedTemplatePath))
-	// {
-	// 	m_templateEditor->SetValue(wxString::Format("Error: Template file not found: %s", selectedTemplatePath));
-	// 	return;
-	// }
+	// // Check if template file exists
+	if (!wxFile::Exists(selectedTemplatePath))
+	{
+		m_templateEditor->SetValue(wxString::Format("Error: Template file not found: %s", selectedTemplatePath));
+		return;
+	}
 
-	// // Load the template file contents
-	// wxFileInputStream fileStream(selectedTemplatePath);
-	// if (!fileStream.IsOk())
-	// {
-	// 	m_templateEditor->SetValue(wxString::Format("Error: Failed to open template file: %s", selectedTemplatePath));
-	// 	return;
-	// }
+	// Load the template file contents
+	wxFileInputStream fileStream(selectedTemplatePath);
+	if (!fileStream.IsOk())
+	{
+		m_templateEditor->SetValue(wxString::Format("Error: Failed to open template file: %s", selectedTemplatePath));
+		return;
+	}
 
-	// wxTextInputStream textStream(fileStream);
-	// wxString templateContents;
+	wxTextInputStream textStream(fileStream);
+	wxString templateContents;
 
-	// // Read the entire file contents
-	// while (!fileStream.Eof())
-	// {
-	// 	templateContents += textStream.ReadLine() + "\n";
-	// }
+	// Read the entire file contents
+	while (!fileStream.Eof())
+	{
+		templateContents += textStream.ReadLine() + "\n";
+	}
 
-	// // Set the loaded content into m_templateEditor
-	// m_templateEditor->SetValue(templateContents);
+	std::cout << "Well it seems like the template file was read into wxString templateContents" << std::endl;
+	std::cout << "templateContents:\n\n"
+			  << templateContents << std::endl;
+	// Set the loaded content into m_templateEditor
+	m_templateEditor->SetValue(templateContents);
+}
+
+void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
+{
+	std::cout << "Hello the OnTemplateListUpdated event was triggered!" << std::endl;
+	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
+	m_templatesExisting->Clear();
+	for (size_t i = 0; i < m_wxChoice_Templates->GetCount(); ++i)
+	{
+		m_templatesExisting->Append(m_wxChoice_Templates->GetString(i));
+	}
 }

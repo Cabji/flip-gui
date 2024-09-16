@@ -100,14 +100,14 @@ class ProgramLog : public wxFrame
 class TemplateEditor : public wxFrame
 {
 	private:
-		wxChoice* m_templatesExisting;
 
 	protected:
-		wxButton* m_btnTemplateAdd;
+		wxFilePickerCtrl* m_filePickerAddNew;
+		wxButton* m_btnAddTemplate;
+		wxChoice* m_templatesExisting;
 		wxButton* m_btnTemplateRemove;
 		wxTextCtrl* m_templateEditor;
-		wxStaticText* m_lblAddTemplate;
-		wxTextCtrl* m_AddTemplate;
+		wxStatusBar* m_templateEditorStatusBar;
 
 	public:
 

@@ -46,8 +46,6 @@ public:
 private:
 	// event handlers
 	void OnAbout(wxCommandEvent &event);
-	void OnButtonHover(wxMouseEvent &event);
-	void OnButtonLeave(wxMouseEvent &event);
 	void OnChoice(wxCommandEvent &event);
 	void OnQuit(wxCommandEvent &event);
 	void OnShowProgramLog(wxCommandEvent &event);

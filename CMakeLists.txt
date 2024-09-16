@@ -9,8 +9,7 @@ set(wxWidgets_INCLUDE_DIRS
     "${wxWidgets_LIB_DIR}mswu/" 
     "${CMAKE_SOURCE_DIR}"
 )
-
-#set(CMAKE_CXX_FLAGS "-mwindows")
+set(CMAKE_CXX_FLAGS "-mwindows")
 
 find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
 include(${wxWidgets_USE_FILE})
@@ -25,7 +24,7 @@ add_executable(FlipApp
 )
 
 target_include_directories(FlipApp PRIVATE ${wxWidgets_INCLUDE_DIRS})
-target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES})
+target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES} dwmapi)
 
 # Define the source and destination resource directories
 set(RESOURCE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources")

@@ -13,6 +13,7 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 	//			 m_existingTemplates hides the wxChoice member in the base class and is
 	//			 a pointer in FlipTemplateEditor.
 
+	m_mainFrame = parent;
 	m_wxChoice_Templates = parent->m_useTemplate;
 	// bind event handlers
 	Bind(wxEVT_CLOSE_WINDOW, &FlipTemplateEditor::OnClose, this);
@@ -32,8 +33,28 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	if (!target)
 	{
 		// we didn't get anything from the file picker control
+		std::cout << "TE::OnBtnAdd: target value was empty" << std::endl;
+		m_mainFrame->LogMessage("TE::OnBtnAdd: target value was empty");
+		return;
 	}
-	std::cout << "Well it seems like the file picker wants to make a file at: " << target << std::endl;
+
+	// get filename & path seperately
+	wxFileName absoluteFilename(target);
+	wxString path = absoluteFilename.GetPath();
+	wxString filename = absoluteFilename.GetFullName();
+
+	// check path existence & create if required
+	if (!wxDirExists(path) && path != "")
+	{
+		if (wxFileName::Mkdir(path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
+		{
+			std::cout << "TE::OnBtnAdd: Created directory: " << path << " for new template creation." << std::endl;
+			m_mainFrame->LogMessage("TE::OnBtnAdd: Created directory: " + path + " for new template creation.");
+		}
+	}
+
+	// create new template file
+	std::cout << "Template Editor wants to make a new file at: " << target << std::endl;
 }
 
 void FlipTemplateEditor::OnClose(wxCloseEvent &event)

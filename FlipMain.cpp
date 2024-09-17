@@ -195,6 +195,15 @@ void FlipMain::LogChildWidgetsRecursive(wxWindow *parent)
     }
 }
 
+void FlipMain::LogMessage(wxString message)
+{
+    // public function to pass messages to the Program Log
+    if (m_programLog)
+    {
+        m_programLog->LogMessage(message);
+    }
+}
+
 void FlipMain::OnAbout(wxCommandEvent &event)
 {
     wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
@@ -213,7 +222,7 @@ void FlipMain::OnChoice(wxCommandEvent &event)
     if (selection != wxNOT_FOUND)
     {
         choice->SetToolTip(m_tmap_userTemplates[choice->GetStringSelection()]);
-        FlipProgramLog::LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")", *m_programLog);
+        LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")");
     }
 
     event.Skip(); // Call this to allow other event handlers to process this event

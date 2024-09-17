@@ -32,6 +32,7 @@ public:
 	// cutom constructor declared below here
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
+	void LogMessage(wxString message);
 	static TemplateMap ReadUserTemplates(const wxArrayString &readPaths);
 
 	// widget related methods
@@ -42,7 +43,10 @@ public:
 	static const wxString RESOURCE_MENU_ICONS_PATH;
 	TemplateMap m_tmap_userTemplates;
 
-	// custom class members are below here
+protected:
+	std::unique_ptr<FlipProgramLog> m_programLog;
+	std::unique_ptr<FlipTemplateEditor> m_templateEditor;
+
 private:
 	// event handlers
 	void OnAbout(wxCommandEvent &event);
@@ -51,10 +55,6 @@ private:
 	void OnShowProgramLog(wxCommandEvent &event);
 	void OnShowTemplateEditor(wxCommandEvent &event);
 	void OnSwitchDBPChecked(wxCommandEvent &event);
-
-	// private members
-	std::unique_ptr<FlipProgramLog> m_programLog;
-	std::unique_ptr<FlipTemplateEditor> m_templateEditor;
 
 	// private methods
 	void SetupMenuIcons(wxMenu *menu);

@@ -23,6 +23,8 @@ public:
 	void OnTemplateListUpdated(wxCommandEvent &event);
 
 	wxChoice *m_wxChoice_Templates; // ptr to parent's wxChoice for templates
+private:
+	FlipMain *m_mainFrame;
 };
 
 #endif // __FlipTemplateEditor__

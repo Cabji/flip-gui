@@ -1,10 +1,13 @@
 #include "FlipMain.h"
 #include "FlipTemplateEditor.h"
-#include <wx/wfstream.h>
+#include <wx/timer.h>
 #include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 
 FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
-	: TemplateEditor(parent)
+	: TemplateEditor(parent),
+	  m_teCurrentTemplate(wxEmptyString),
+	  m_teAutoSaveTimer(this)
 {
 	// dev-note: m_existingTemplates points to -> FlipMain::m_useTemplate which is
 	//			 inherited from -> Flip base class. m_useTemplates is defined as a
@@ -19,6 +22,7 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 
 	// bind event handlers
 	Bind(wxEVT_CLOSE_WINDOW, &FlipTemplateEditor::OnClose, this);
+	Bind(wxEVT_TIMER, &FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout, this);
 	m_btnAddTemplate->Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnAddTemplate, this);
 	m_templatesExisting->Bind(wxEVT_CHOICE, &FlipTemplateEditor::OnTemplateChoiceChanged, this);
 	m_templateEditor->Bind(wxEVT_TEXT, FlipTemplateEditor::OnTemplateEditorTextChanged, this);
@@ -126,29 +130,47 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 	m_templateEditor->SetValue(templateContents);
 }
 
-void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
+void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 {
-	std::cout << "m_templateEditor event: wxEVT_TEXT occured" << std::endl;
-	// when text is changed in the template editor
+	// handles auto-save of template content in T.E. when the timer runs out.
+	// when m_teAutoSaveTimer expires
 	// we should save to the currently selected template file, absolute path+filename is stored in m_teCurrentTemplate
 	if (!m_teCurrentTemplate.IsEmpty())
 	{
-		std::cout << "wxEVT_TEXT: m_teCurrentTemplare is not empty" << std::endl;
 		// open file for writing (truncate existing content)
 		wxFileOutputStream fileStream(m_teCurrentTemplate);
 		if (!fileStream.IsOk())
 		{
 			std::cout << "Failed to open template file " << m_teCurrentTemplate << " for writing." << std::endl;
 			m_mainFrame->LogMessage("Failed to open template file " + m_teCurrentTemplate + " for writing.");
+			m_teAutoSaveTimer.Stop();
 			return;
 		}
 		wxTextOutputStream textStream(fileStream);
 
 		// write current content of m_templateEditor to file
 		textStream.WriteString(m_templateEditor->GetValue());
-		std::cout << "Wrote template editor content to file on disk." << std::endl;
-		m_mainFrame->LogMessage("Wrote template editor content to file on disk.");
+		std::cout << "Autosaved template editor content to file on disk." << std::endl;
+		m_mainFrame->LogMessage("Autosaved template editor content to file on disk.");
+		m_teAutoSaveTimer.Stop();
+		m_templateEditorStatusBar->SetStatusText("Autosaved template");
 	}
+}
+
+void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
+{
+	m_templateEditorStatusBar->SetStatusText("Template content modified");
+	// if the auto save timer is running, reset it
+	if (m_teAutoSaveTimer.IsRunning())
+	{
+		m_teAutoSaveTimer.Start(-1);
+	}
+	else
+	{
+		m_teAutoSaveTimer.Start(m_teAutoSaveDelay, true);
+	}
+	// dev-note: when m_teAutoSaveTimer expires (after m_teAutoSaveDelay milliseconds of the user not typing)
+	// the timer's event handler OnTemplateEditorAutoSaveTimeout will save the T.E. content to disk.
 }
 
 void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)

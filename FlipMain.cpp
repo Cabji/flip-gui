@@ -8,6 +8,7 @@
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
+#include <wx/utils.h>
 
 // define custom events
 wxDEFINE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
@@ -22,7 +23,9 @@ FlipMain::FlipMain(wxWindow *parent)
 
 FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) : Main(parent)
 {
-    // custom constructor
+    // defaults
+    const wxString FLIP_DEFAULT_CONFIG_PATH = wxGetHomeDir() + "/.flip";
+    const wxString FLIP_DEFAULT_TEMPLATE_PATH = FLIP_DEFAULT_CONFIG_PATH + "/templates";
 
     //  create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);

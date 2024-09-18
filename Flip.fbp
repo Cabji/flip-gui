@@ -1152,7 +1152,7 @@
             <property name="max_size"></property>
             <property name="maximize_button">0</property>
             <property name="maximum_size"></property>
-            <property name="message">Select a file</property>
+            <property name="message">Add new template file</property>
             <property name="min_size"></property>
             <property name="minimize_button">0</property>
             <property name="minimum_size"></property>

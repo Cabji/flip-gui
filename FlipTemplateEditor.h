@@ -20,11 +20,13 @@ public:
 	void OnBtnAddTemplate(wxCommandEvent &event);
 	void OnClose(wxCloseEvent &event);
 	void OnTemplateChoiceChanged(wxCommandEvent &event);
+	void OnTemplateEditorTextChanged(wxCommandEvent &event);
 	void OnTemplateListUpdated(wxCommandEvent &event);
 
 	wxChoice *m_wxChoice_Templates; // ptr to parent's wxChoice for templates
 private:
 	FlipMain *m_mainFrame;
+	wxString m_teCurrentTemplate;
 };
 
 #endif // __FlipTemplateEditor__

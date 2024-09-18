@@ -41,6 +41,8 @@ public:
 
 	// public members
 	static const wxString RESOURCE_MENU_ICONS_PATH;
+	const wxString FLIP_DEFAULT_CONFIG_PATH,
+		FLIP_DEFAULT_TEMPLATE_PATH;
 	TemplateMap m_tmap_userTemplates;
 
 protected:

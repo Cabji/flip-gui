@@ -181,7 +181,7 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 	m_templateEditorSizer->SetFlexibleDirection( wxBOTH );
 	m_templateEditorSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_filePickerAddNew = new wxFilePickerCtrl( this, wxID_ANY, wxT("Add new template..."), _("Select a file"), _("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_SAVE|wxFLP_USE_TEXTCTRL );
+	m_filePickerAddNew = new wxFilePickerCtrl( this, wxID_ANY, wxT("Add new template..."), _("Add new template file"), _("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_SAVE|wxFLP_USE_TEXTCTRL );
 	m_templateEditorSizer->Add( m_filePickerAddNew, wxGBPosition( 0, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
 	m_btnAddTemplate = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );

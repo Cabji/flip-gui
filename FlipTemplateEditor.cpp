@@ -1,6 +1,8 @@
 #include "FlipMain.h"
 #include "FlipTemplateEditor.h"
+#include <wx/regex.h>
 #include <wx/timer.h>
+#include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
@@ -132,29 +134,74 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 {
-	// handles auto-save of template content in T.E. when the timer runs out.
-	// when m_teAutoSaveTimer expires
-	// we should save to the currently selected template file, absolute path+filename is stored in m_teCurrentTemplate
 	if (!m_teCurrentTemplate.IsEmpty())
 	{
-		// open file for writing (truncate existing content)
-		wxFileOutputStream fileStream(m_teCurrentTemplate);
-		if (!fileStream.IsOk())
-		{
-			std::cout << "Failed to open template file " << m_teCurrentTemplate << " for writing." << std::endl;
-			m_mainFrame->LogMessage("Failed to open template file " + m_teCurrentTemplate + " for writing.");
-			m_teAutoSaveTimer.Stop();
-			return;
-		}
-		wxTextOutputStream textStream(fileStream);
+		wxString statusMessage = wxEmptyString;
+		wxString content = m_templateEditor->GetValue();
+		wxStringTokenizer tokenizer(content, "\n");			// Split content by lines
+		wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // Pattern for "regex => replacement"
+		wxString commentPattern = "^\\s*//.*$|^\\s*#.*$";	// Pattern for comments
+		wxString blankPattern = "^\\s*$";					// Pattern for blank lines
+		wxRegEx regexValidator(regexPattern);
+		wxRegEx commentValidator(commentPattern);
+		wxRegEx blankValidator(blankPattern);
+		wxString line;
+		bool isValid = true; // Assume the content is valid until proven otherwise
 
-		// write current content of m_templateEditor to file
-		textStream.WriteString(m_templateEditor->GetValue());
-		std::cout << "Autosaved template editor content to file on disk." << std::endl;
-		m_mainFrame->LogMessage("Autosaved template editor content to file on disk.");
-		m_teAutoSaveTimer.Stop();
-		m_templateEditorStatusBar->SetStatusText("Autosaved template");
+		while (tokenizer.HasMoreTokens())
+		{
+			line = tokenizer.GetNextToken().Trim(true).Trim(false); // Trim whitespace from both sides
+
+			if (blankValidator.Matches(line) || commentValidator.Matches(line))
+			{
+				// Ignore blank lines or comments
+				continue;
+			}
+
+			if (!regexValidator.Matches(line))
+			{
+				// If the line doesn't match the "regex => replacement" format
+				wxString errorMessage = wxString::Format("Invalid line: '%s'", line);
+				std::cout << errorMessage << std::endl;
+				m_mainFrame->LogMessage(errorMessage);
+
+				// Set the status bar text to indicate invalid regex
+				statusMessage << "Template regexes invalid - please check your regexes";
+
+				isValid = false; // Mark as invalid
+				break;			 // Stop further checks
+			}
+
+			// If we reach here, the line is valid.
+			wxString leftSide = regexValidator.GetMatch(line, 1);
+			wxString rightSide = regexValidator.GetMatch(line, 2);
+
+			// Further processing with leftSide and rightSide can be done here
+			std::cout << "Valid regex: " << leftSide << " => " << rightSide << std::endl;
+		}
+
+		if (isValid)
+		{
+			// Set the status bar text to indicate valid regex
+			statusMessage << "Template regexes valid";
+
+			// Save the content to the file (after validation)
+			wxFileOutputStream fileStream(m_teCurrentTemplate);
+			if (!fileStream.IsOk())
+			{
+				std::cout << "Failed to open template file " << m_teCurrentTemplate << " for writing." << std::endl;
+				m_mainFrame->LogMessage("Failed to open template file " + m_teCurrentTemplate + " for writing.");
+				return;
+			}
+			wxTextOutputStream textStream(fileStream);
+			textStream.WriteString(content);
+			std::cout << "Wrote template editor content to file on disk." << std::endl;
+			m_mainFrame->LogMessage("Wrote template editor content to file on disk.");
+			statusMessage << " | Template content saved to disk";
+		}
+		m_templateEditorStatusBar->SetStatusText(statusMessage);
 	}
+	m_teAutoSaveTimer.Stop(); // Stop the timer after saving
 }
 
 void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)

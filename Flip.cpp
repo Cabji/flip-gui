@@ -205,6 +205,7 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 
 
 	m_templateEditorSizer->AddGrowableCol( 1 );
+	m_templateEditorSizer->AddGrowableRow( 2 );
 
 	this->SetSizer( m_templateEditorSizer );
 	this->Layout();

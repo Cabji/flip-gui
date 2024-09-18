@@ -1106,7 +1106,7 @@
         <property name="empty_cell_size"></property>
         <property name="flexible_direction">wxBOTH</property>
         <property name="growablecols">1</property>
-        <property name="growablerows"></property>
+        <property name="growablerows">2</property>
         <property name="hgap">0</property>
         <property name="minimum_size"></property>
         <property name="name">m_templateEditorSizer</property>

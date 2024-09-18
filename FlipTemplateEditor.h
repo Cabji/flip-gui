@@ -30,7 +30,7 @@ private:
 	FlipMain *m_mainFrame;
 	wxString m_teCurrentTemplate;
 	wxTimer m_teAutoSaveTimer;
-	int m_teAutoSaveDelay = 5000;
+	int m_teAutoSaveDelay = 2500;
 };
 
 #endif // __FlipTemplateEditor__

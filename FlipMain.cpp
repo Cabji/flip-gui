@@ -42,14 +42,14 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
     // spcific widget binds
-    m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnChoice, this);
+    m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnUseTemplateChoice, this);
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
 
     // example of static call to LogMessage:
     // FlipProgramLog::LogMessage("This is a test.", *m_programLog);
 
     wxArrayString configTemplatePaths;
-    configTemplatePaths.Add(wxGetHomeDir() + "/.flip/templates");
+    configTemplatePaths.Add(FLIP_DEFAULT_CONFIG_PATH);
     configTemplatePaths.Add("./templates");
 
     FlipProgramLog::LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates", *m_programLog);
@@ -80,15 +80,19 @@ FlipMain::~FlipMain()
 TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
 {
     TemplateMap returnVals;
+
     for (const wxString &path : readPaths)
     {
         wxArrayString files;
-        wxDir::GetAllFiles(path, &files, "*.*", wxDIR_FILES);
+        wxDir::GetAllFiles(path, &files, "*.*", wxDIR_FILES | wxDIR_DIRS);
 
         for (const wxString &file : files)
         {
             wxFileName fullPath(file);
-            wxString relativePath = fullPath.GetFullName();
+
+            // Get the relative path from the base directory (readPaths item) to the file
+            wxString relativePath = fullPath.GetFullPath().Mid(path.length() + 1); // +1 to remove the extra slash
+
             returnVals[relativePath] = fullPath.GetFullPath();
         }
     }
@@ -212,7 +216,7 @@ void FlipMain::OnAbout(wxCommandEvent &event)
     wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
 }
 
-void FlipMain::OnChoice(wxCommandEvent &event)
+void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
 {
     // scope: we are in an instance of FlipMain
     // auto className = typeid(*this).name(); // get class name of object that triggered the event

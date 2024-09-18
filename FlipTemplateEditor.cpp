@@ -36,43 +36,64 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 
 void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 {
-	// get filename info from m_filePickerAddNew
+	// Get filename info from m_filePickerAddNew
 	wxString target = m_filePickerAddNew->GetTextCtrlValue();
-	if (!target)
+	if (target.IsEmpty())
 	{
-		// we didn't get anything from the file picker control
+		// We didn't get anything from the file picker control
 		std::cout << "TE::OnBtnAdd: target value was empty" << std::endl;
 		m_mainFrame->LogMessage("TE::OnBtnAdd: target value was empty");
 		return;
 	}
 
-	// get filename & path seperately
+	// Get filename & path separately
 	wxFileName absoluteFilename(target);
 	wxString path = absoluteFilename.GetPath();
 	wxString filename = absoluteFilename.GetFullName();
 
-	// check path existence & create if required
-	if (!wxDirExists(path) && path != "")
+	// Check path existence & create if required
+	if (!wxDirExists(path) && !path.IsEmpty())
 	{
 		if (!wxFileName::Mkdir(path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
 		{
-			std::cout << "TE::OntnAdd: Could not create directory for new template file: " << target << std::endl;
+			std::cout << "TE::OnBtnAdd: Could not create directory for new template file: " << target << std::endl;
+			m_mainFrame->LogMessage("TE::OnBtnAdd: Could not create directory for new template file: " + target);
 			return;
 		}
 		std::cout << "TE::OnBtnAdd: Created directory: " << path << " for new template creation." << std::endl;
 		m_mainFrame->LogMessage("TE::OnBtnAdd: Created directory: " + path + " for new template creation.");
 	}
 
-	// create new template file
-	wxFileStream wxfs_Target(target);
+	// Create new template file
+	wxFileOutputStream wxfs_Target(target);
 	if (!wxfs_Target.IsOk())
 	{
-		std::cout << "TE::OnBtnAdd: creation of new template file failed" << std::endl;
-		m_mainFrame->LogMessage("TE::OnBtnAdd: creation of new template file failed");
+		std::cout << "TE::OnBtnAdd: Creation of new template file failed" << std::endl;
+		m_mainFrame->LogMessage("TE::OnBtnAdd: Creation of new template file failed");
 		return;
 	}
 
-	std::cout << "Template Editor wants to make a new file at: " << target << std::endl;
+	std::cout << "Template Editor created a new file at: " << target << std::endl;
+	m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
+
+	// Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
+	m_mainFrame->m_tmap_userTemplates[filename] = target;
+
+	// Update m_templatesExisting and m_useTemplate wxChoice widgets
+	m_templatesExisting->Append(filename);	// For template editor wxChoice
+	m_wxChoice_Templates->Append(filename); // For main frame wxChoice
+
+	// Select the new template in both wxChoice widgets
+	int newIndex = m_templatesExisting->FindString(filename);
+	m_templatesExisting->SetSelection(newIndex);
+	m_wxChoice_Templates->SetSelection(newIndex);
+
+	// Trigger the event handler to load the new file into the template editor
+	wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
+	choiceEvent.SetInt(newIndex);
+	OnTemplateChoiceChanged(choiceEvent);
+
+	std::cout << "New template added, and editor updated." << std::endl;
 }
 
 void FlipTemplateEditor::OnClose(wxCloseEvent &event)

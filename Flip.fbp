@@ -1461,7 +1461,7 @@
             <property name="style">wxTE_DONTWRAP|wxTE_MULTILINE</property>
             <property name="subclass">; ; forward_declare</property>
             <property name="toolbar_pane">0</property>
-            <property name="tooltip"></property>
+            <property name="tooltip">Template Editor Help&#x0A;&#x0A;// this is a comment&#x0A;# this is a comment&#x0A;// blank lines are ignored (whitespace only is also ignored)&#x0A;&#x0A;left side regex =&gt; right side substitution&#x0A;// &apos; =&gt; &apos; is the seperator, including leading and trailing whitespace: space, equals, greater than, space&#x0A;&#x0A;cat =&gt; dog&#x0A;// will change cat to dog&#x0A;cockroaches =&gt; &#x0A;// will make all cockroaches disappear</property>
             <property name="validator_data_type"></property>
             <property name="validator_style">wxFILTER_NONE</property>
             <property name="validator_type">wxDefaultValidator</property>

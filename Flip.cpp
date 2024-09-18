@@ -199,6 +199,7 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 
 	m_templateEditor = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_DONTWRAP|wxTE_MULTILINE );
 	m_templateEditor->SetFont( wxFont( 9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Fixedsys") ) );
+	m_templateEditor->SetToolTip( _("Template Editor Help\n\n// this is a comment\n# this is a comment\n// blank lines are ignored (whitespace only is also ignored)\n\nleft side regex => right side substitution\n// ' => ' is the seperator, including leading and trailing whitespace: space, equals, greater than, space\n\ncat => dog\n// will change cat to dog\ncockroaches => \n// will make all cockroaches disappear") );
 	m_templateEditor->SetMinSize( wxSize( -1,150 ) );
 
 	m_templateEditorSizer->Add( m_templateEditor, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxEXPAND, 5 );

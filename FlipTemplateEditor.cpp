@@ -243,7 +243,7 @@ void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
 {
-	std::cout << "Hello the OnTemplateListUpdated event was triggered!" << std::endl;
+	std::cout << "\tFlipTemplateEditor::m_templatesExisting wxChoices widget updated" << std::endl;
 	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
 	m_templatesExisting->Clear();
 	for (size_t i = 0; i < m_wxChoice_Templates->GetCount(); ++i)

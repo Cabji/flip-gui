@@ -41,6 +41,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
+    Bind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
     // spcific widget binds
     m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnUseTemplateChoice, this);
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
@@ -52,29 +53,197 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     configTemplatePaths.Add(FLIP_DEFAULT_CONFIG_PATH);
     configTemplatePaths.Add("./templates");
 
-    FlipProgramLog::LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates", *m_programLog);
+    // load available templates into wxChoice widgets
+    LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates");
     m_tmap_userTemplates = ReadUserTemplates(configTemplatePaths);
-    // loop the template values we got
-    for (const auto &templatePath : m_tmap_userTemplates)
-    {
-        const wxString &key = templatePath.first;
-        const wxString &value = templatePath.second;
-        // write to wxChoice in mainFrame
-        this->m_useTemplate->AppendString(key);
-        // write out to programlog
-        FlipProgramLog::LogMessage(key + " => " + value, *m_programLog);
-    }
+    // dev-note: UpdateTemplateChoices *should* invoke an update in FlipTemplateEditor::wxChoice widget as well
+    UpdateTemplateChoices();
+
+    // start poll timer to monitor templates folders
+    m_filePollTimer.SetOwner(this); // Attach timer to FlipMain
+    m_filePollTimer.Start(5000);    // Poll every 5 seconds
+
+    // do some wxWidget positioning stuff
     this->SetPosition(this->FromDIP(wxPoint(100, 100)));
     this->SetSize(this->FromDIP(wxSize(400, 300)));
 
-    // Trigger the event to notify FlipTemplateEditor about the change
-    wxCommandEvent event(EVT_TEMPLATE_LIST_UPDATED);
-    wxPostEvent(this, event);
+    // // Trigger event to notify FlipTemplateEditor to update its template choices
+    // wxCommandEvent event(EVT_TEMPLATE_LIST_UPDATED);
+    // wxPostEvent(this, event);
 }
 
 FlipMain::~FlipMain()
 {
     // destructor
+    m_filePollTimer.Stop();
+    Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
+}
+
+void FlipMain::LogAllChildWidgets()
+{
+    // Get the main frame's top-level window
+    wxWindowList &children = GetChildren();
+
+    // Iterate over all top-level children
+    for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it)
+    {
+        wxWindow *child = *it;
+        if (child)
+        {
+            // Log the class name of each child window
+            wxString childClass = child->GetClassInfo()->GetClassName();
+            m_programLog->LogMessage("Child widget class name: " + childClass);
+
+            // Additionally, you can recursively log children of this window if needed
+            LogChildWidgetsRecursive(child);
+        }
+    }
+}
+
+void FlipMain::LogChildWidgetsRecursive(wxWindow *parent)
+{
+    // Iterate over all children of the given parent window
+    wxWindowList &children = parent->GetChildren();
+
+    for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it)
+    {
+        wxWindow *child = *it;
+        if (child)
+        {
+            // Log the class name of each child window
+            wxString childClass = child->GetClassInfo()->GetClassName();
+            wxString parentClass = parent->GetClassInfo()->GetClassName();
+            m_programLog->LogMessage("Child widget of " + parentClass + ": " + childClass);
+
+            // Recursively log children of this window
+            LogChildWidgetsRecursive(child);
+        }
+    }
+}
+
+void FlipMain::LogMessage(wxString message)
+{
+    // public function to pass messages to the Program Log
+    if (m_programLog)
+    {
+        m_programLog->LogMessage(message);
+    }
+}
+
+void FlipMain::OnAbout(wxCommandEvent &event)
+{
+    wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
+}
+
+void FlipMain::OnQuit(wxCommandEvent &event)
+{
+    Close(true);
+}
+
+void FlipMain::OnShowProgramLog(wxCommandEvent &event)
+{
+    if (m_programLog)
+    {
+        std::cout << "Showing Program Log window" << std::endl;
+        m_programLog->Show(true);
+    }
+}
+
+void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
+{
+    if (m_templateEditor)
+    {
+        std::cout << "Showing Template Editor window" << std::endl;
+        m_templateEditor->Show(true);
+    }
+}
+
+void FlipMain::OnSwitchDBPChecked(wxCommandEvent &event)
+{
+    // Get the parent of the checkbox
+    wxWindow *parent = m_switchDBP->GetParent();
+
+    // Get the class name of the parent
+    wxString parentClassName = parent->GetClassInfo()->GetClassName();
+
+    // Log the class name to the Program Log
+    FlipProgramLog::LogMessage("Parent class name: " + parentClassName, *m_programLog);
+
+    // Continue with other logic if needed...
+}
+
+void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
+{
+    // Create a temporary map to store the current state of files on disk
+    TemplateMap currentFileState;
+
+    // Get all files in the directories where templates are stored
+    for (const auto &pair : m_tmap_userTemplates)
+    {
+        wxFileName fullPath(pair.second);
+        wxString path = fullPath.GetPath();
+        wxArrayString files;
+
+        // Recursively get all files in the directory
+        wxDir::GetAllFiles(path, &files, "*.*", wxDIR_FILES);
+
+        for (const wxString &file : files)
+        {
+            wxFileName fileName(file);
+            wxString relativePath = fileName.GetFullName();
+            currentFileState[relativePath] = fileName.GetFullPath();
+        }
+    }
+
+    // Compare currentFileState with m_tmap_userTemplates to detect changes
+    bool hasChanges = false;
+
+    // Check for deleted files (present in m_tmap_userTemplates but not in currentFileState)
+    for (const auto &pair : m_tmap_userTemplates)
+    {
+        if (currentFileState.find(pair.first) == currentFileState.end())
+        {
+            std::cout << "File deleted: " << pair.second << std::endl;
+            hasChanges = true;
+        }
+    }
+
+    // Check for added files (present in currentFileState but not in m_tmap_userTemplates)
+    for (const auto &pair : currentFileState)
+    {
+        if (m_tmap_userTemplates.find(pair.first) == m_tmap_userTemplates.end())
+        {
+            std::cout << "File added: " << pair.second << std::endl;
+            hasChanges = true;
+        }
+    }
+
+    // If there were changes, update m_tmap_userTemplates and the wxChoice widgets
+    if (hasChanges)
+    {
+        std::cout << "File state of templates location has changed, updating template choices" << std::endl;
+        m_tmap_userTemplates = currentFileState;
+        UpdateTemplateChoices();
+    }
+}
+
+void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
+{
+    // scope: we are in an instance of FlipMain
+    // auto className = typeid(*this).name(); // get class name of object that triggered the event
+    // auto pointerInfo = wxString::Format("Pointer: %p", this); // get the object's pointer address
+
+    // get a pointer to the object that triggered the OnChoice event
+    wxChoice *choice = static_cast<wxChoice *>(event.GetEventObject());
+    int selection = choice->GetSelection();
+
+    if (selection != wxNOT_FOUND)
+    {
+        choice->SetToolTip(m_tmap_userTemplates[choice->GetStringSelection()]);
+        LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")");
+    }
+
+    event.Skip(); // Call this to allow other event handlers to process this event
 }
 
 TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
@@ -160,114 +329,19 @@ void FlipMain::SetupMenuIcons(wxMenu *menu)
     }
 }
 
-void FlipMain::LogAllChildWidgets()
+void FlipMain::UpdateTemplateChoices()
 {
-    // Get the main frame's top-level window
-    wxWindowList &children = GetChildren();
+    std::cout << "Updating wxChoice widgets with new template data.\n\tFlipMain::m_useTemplate wxChoice widget updated" << std::endl;
+    // Clear the FlipMain::wxChoice widget
+    m_useTemplate->Clear();
 
-    // Iterate over all top-level children
-    for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it)
+    // Populate the FlipMain::wxChoice widget with updated template data
+    for (const auto &pair : m_tmap_userTemplates)
     {
-        wxWindow *child = *it;
-        if (child)
-        {
-            // Log the class name of each child window
-            wxString childClass = child->GetClassInfo()->GetClassName();
-            m_programLog->LogMessage("Child widget class name: " + childClass);
-
-            // Additionally, you can recursively log children of this window if needed
-            LogChildWidgetsRecursive(child);
-        }
-    }
-}
-
-void FlipMain::LogChildWidgetsRecursive(wxWindow *parent)
-{
-    // Iterate over all children of the given parent window
-    wxWindowList &children = parent->GetChildren();
-
-    for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it)
-    {
-        wxWindow *child = *it;
-        if (child)
-        {
-            // Log the class name of each child window
-            wxString childClass = child->GetClassInfo()->GetClassName();
-            wxString parentClass = parent->GetClassInfo()->GetClassName();
-            m_programLog->LogMessage("Child widget of " + parentClass + ": " + childClass);
-
-            // Recursively log children of this window
-            LogChildWidgetsRecursive(child);
-        }
-    }
-}
-
-void FlipMain::LogMessage(wxString message)
-{
-    // public function to pass messages to the Program Log
-    if (m_programLog)
-    {
-        m_programLog->LogMessage(message);
-    }
-}
-
-void FlipMain::OnAbout(wxCommandEvent &event)
-{
-    wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
-}
-
-void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
-{
-    // scope: we are in an instance of FlipMain
-    // auto className = typeid(*this).name(); // get class name of object that triggered the event
-    // auto pointerInfo = wxString::Format("Pointer: %p", this); // get the object's pointer address
-
-    // get a pointer to the object that triggered the OnChoice event
-    wxChoice *choice = static_cast<wxChoice *>(event.GetEventObject());
-    int selection = choice->GetSelection();
-
-    if (selection != wxNOT_FOUND)
-    {
-        choice->SetToolTip(m_tmap_userTemplates[choice->GetStringSelection()]);
-        LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")");
+        m_useTemplate->Append(pair.first); // Add the relative file name
     }
 
-    event.Skip(); // Call this to allow other event handlers to process this event
-}
-
-void FlipMain::OnQuit(wxCommandEvent &event)
-{
-    Close(true);
-}
-
-void FlipMain::OnShowProgramLog(wxCommandEvent &event)
-{
-    if (m_programLog)
-    {
-        std::cout << "Showing Program Log window" << std::endl;
-        m_programLog->Show(true);
-    }
-}
-
-void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
-{
-    if (m_templateEditor)
-    {
-        std::cout << "Showing Template Editor window" << std::endl;
-        m_templateEditor->Show(true);
-    }
-}
-
-void FlipMain::OnSwitchDBPChecked(wxCommandEvent &event)
-{
-    // Get the parent of the checkbox
-    wxWindow *parent = m_switchDBP->GetParent();
-
-    // Get the class name of the parent
-    wxString parentClassName = parent->GetClassInfo()->GetClassName();
-
-    // Log the class name to the Program Log
-    FlipProgramLog::LogMessage("Parent class name: " + parentClassName, *m_programLog);
-
-    // Continue with other logic if needed...
+    // update the Template Editor wxChoice widget by triggering FlipTemplateEditor::OnTemplateListUpdated with a wxCommandEvent
+    wxCommandEvent event;
+    m_templateEditor->OnTemplateListUpdated(event);
 }

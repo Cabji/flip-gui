@@ -49,13 +49,12 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     // example of static call to LogMessage:
     // FlipProgramLog::LogMessage("This is a test.", *m_programLog);
 
-    wxArrayString configTemplatePaths;
-    configTemplatePaths.Add(FLIP_DEFAULT_CONFIG_PATH);
-    configTemplatePaths.Add("./templates");
+    m_configTemplateDirs.Add(FLIP_DEFAULT_CONFIG_PATH);
+    m_configTemplateDirs.Add("./templates");
 
     // load available templates into wxChoice widgets
     LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates");
-    m_tmap_userTemplates = ReadUserTemplates(configTemplatePaths);
+    m_tmap_userTemplates = ReadUserTemplates(m_configTemplateDirs);
     // dev-note: UpdateTemplateChoices *should* invoke an update in FlipTemplateEditor::wxChoice widget as well
     UpdateTemplateChoices();
 
@@ -66,10 +65,6 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     // do some wxWidget positioning stuff
     this->SetPosition(this->FromDIP(wxPoint(100, 100)));
     this->SetSize(this->FromDIP(wxSize(400, 300)));
-
-    // // Trigger event to notify FlipTemplateEditor to update its template choices
-    // wxCommandEvent event(EVT_TEMPLATE_LIST_UPDATED);
-    // wxPostEvent(this, event);
 }
 
 FlipMain::~FlipMain()
@@ -174,26 +169,8 @@ void FlipMain::OnSwitchDBPChecked(wxCommandEvent &event)
 
 void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
 {
-    // Create a temporary map to store the current state of files on disk
-    TemplateMap currentFileState;
-
-    // Get all files in the directories where templates are stored
-    for (const auto &pair : m_tmap_userTemplates)
-    {
-        wxFileName fullPath(pair.second);
-        wxString path = fullPath.GetPath();
-        wxArrayString files;
-
-        // Recursively get all files in the directory
-        wxDir::GetAllFiles(path, &files, "*.*", wxDIR_FILES);
-
-        for (const wxString &file : files)
-        {
-            wxFileName fileName(file);
-            wxString relativePath = fileName.GetFullName();
-            currentFileState[relativePath] = fileName.GetFullPath();
-        }
-    }
+    // Get the current state of the files on disk using the refactored ReadUserTemplates
+    TemplateMap currentFileState = ReadUserTemplates(m_configTemplateDirs);
 
     // Compare currentFileState with m_tmap_userTemplates to detect changes
     bool hasChanges = false;
@@ -201,6 +178,10 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
     // Check for deleted files (present in m_tmap_userTemplates but not in currentFileState)
     for (const auto &pair : m_tmap_userTemplates)
     {
+        // Normalize paths for comparison
+        wxFileName existingFile(pair.second);
+        wxString existingRelativePath = existingFile.GetFullPath();
+
         if (currentFileState.find(pair.first) == currentFileState.end())
         {
             std::cout << "File deleted: " << pair.second << std::endl;
@@ -211,6 +192,10 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
     // Check for added files (present in currentFileState but not in m_tmap_userTemplates)
     for (const auto &pair : currentFileState)
     {
+        // Normalize paths for comparison
+        wxFileName newFile(pair.second);
+        wxString newRelativePath = newFile.GetFullPath();
+
         if (m_tmap_userTemplates.find(pair.first) == m_tmap_userTemplates.end())
         {
             std::cout << "File added: " << pair.second << std::endl;

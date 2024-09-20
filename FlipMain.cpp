@@ -63,8 +63,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     m_filePollTimer.Start(5000);    // Poll every 5 seconds
 
     // do some wxWidget positioning stuff
-    this->SetPosition(this->FromDIP(wxPoint(100, 100)));
-    this->SetSize(this->FromDIP(wxSize(400, 300)));
+    this->Fit();
 }
 
 FlipMain::~FlipMain()

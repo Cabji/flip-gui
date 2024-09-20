@@ -146,6 +146,12 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 		templateContents += textStream.ReadLine() + "\n";
 	}
 
+	// Remove the last newline character if it exists
+	if (!templateContents.IsEmpty() && templateContents.Last() == '\n')
+	{
+		templateContents.RemoveLast();
+	}
+
 	std::cout << "Well it seems like the template file was read into wxString templateContents" << std::endl;
 	std::cout << "templateContents:\n\n"
 			  << templateContents << std::endl;

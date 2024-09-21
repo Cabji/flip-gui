@@ -34,7 +34,8 @@ public:
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
 	void LogMessage(wxString message);
-	static TemplateMap ReadUserTemplates(const wxArrayString &readPaths);
+	TemplateMap ReadUserTemplates();
+	void UpdateTemplateChoices();
 
 	// widget related methods
 	void LogAllChildWidgets();
@@ -63,7 +64,6 @@ private:
 
 	// private methods
 	void SetupMenuIcons(wxMenu *menu);
-	void UpdateTemplateChoices();
 
 	// private members
 	wxArrayString m_configTemplateDirs;

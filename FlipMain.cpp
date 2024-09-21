@@ -54,7 +54,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
 
     // load available templates into wxChoice widgets
     LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates");
-    m_tmap_userTemplates = ReadUserTemplates(m_configTemplateDirs);
+    m_tmap_userTemplates = ReadUserTemplates();
     // dev-note: UpdateTemplateChoices *should* invoke an update in FlipTemplateEditor::wxChoice widget as well
     UpdateTemplateChoices();
 
@@ -169,7 +169,7 @@ void FlipMain::OnSwitchDBPChecked(wxCommandEvent &event)
 void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
 {
     // Get the current state of the files on disk using the refactored ReadUserTemplates
-    TemplateMap currentFileState = ReadUserTemplates(m_configTemplateDirs);
+    TemplateMap currentFileState = ReadUserTemplates();
 
     // Compare currentFileState with m_tmap_userTemplates to detect changes
     bool hasChanges = false;
@@ -230,11 +230,11 @@ void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
     event.Skip(); // Call this to allow other event handlers to process this event
 }
 
-TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
+TemplateMap FlipMain::ReadUserTemplates()
 {
     TemplateMap returnVals;
 
-    for (const wxString &path : readPaths)
+    for (const wxString &path : m_configTemplateDirs)
     {
         wxArrayString files;
         wxDir::GetAllFiles(path, &files, "*.*", wxDIR_FILES | wxDIR_DIRS);
@@ -243,7 +243,7 @@ TemplateMap FlipMain::ReadUserTemplates(const wxArrayString &readPaths)
         {
             wxFileName fullPath(file);
 
-            // Get the relative path from the base directory (readPaths item) to the file
+            // Get the relative path from the base directory (m_configTemplateDirs item) to the file
             wxString relativePath = fullPath.GetFullPath().Mid(path.length() + 1); // +1 to remove the extra slash
 
             returnVals[relativePath] = fullPath.GetFullPath();

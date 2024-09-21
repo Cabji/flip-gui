@@ -1,5 +1,6 @@
 #include "FlipMain.h"
 #include "FlipTemplateEditor.h"
+#include <wx/msgdlg.h>
 #include <wx/regex.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
@@ -20,12 +21,13 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 
 	// set pointers to parent objects
 	m_mainFrame = parent;
-	m_wxChoice_Templates = parent->m_useTemplate;
+	m_wxChoicePtr_Templates = parent->m_useTemplate;
 
 	// bind event handlers
 	Bind(wxEVT_CLOSE_WINDOW, &FlipTemplateEditor::OnClose, this);
 	Bind(wxEVT_TIMER, &FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout, this);
 	m_btnAddTemplate->Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnAddTemplate, this);
+	m_btnRemoveTemplate->Bind(wxEVT_BUTTON, &FlipTemplateEditor::OnBtnRemoveTemplate, this);
 	m_templatesExisting->Bind(wxEVT_CHOICE, &FlipTemplateEditor::OnTemplateChoiceChanged, this);
 	m_templateEditor->Bind(wxEVT_TEXT, FlipTemplateEditor::OnTemplateEditorTextChanged, this);
 	parent->Bind(EVT_TEMPLATE_LIST_UPDATED, &FlipTemplateEditor::OnTemplateListUpdated, this);
@@ -79,14 +81,13 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	// Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
 	m_mainFrame->m_tmap_userTemplates[filename] = target;
 
-	// Update m_templatesExisting and m_useTemplate wxChoice widgets
-	m_templatesExisting->Append(filename);	// For template editor wxChoice
-	m_wxChoice_Templates->Append(filename); // For main frame wxChoice
+	// Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets
+	m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
 
 	// Select the new template in both wxChoice widgets
 	int newIndex = m_templatesExisting->FindString(filename);
 	m_templatesExisting->SetSelection(newIndex);
-	m_wxChoice_Templates->SetSelection(newIndex);
+	m_wxChoicePtr_Templates->SetSelection(newIndex);
 
 	// Trigger the event handler to load the new file into the template editor
 	wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
@@ -94,6 +95,51 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	OnTemplateChoiceChanged(choiceEvent);
 
 	std::cout << "New template added, and editor updated." << std::endl;
+	m_templateEditorStatusBar->SetStatusText("New template created at " + target);
+}
+
+void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)
+{
+	// Check if a template is selected in m_templatesExisting
+	int selectionIndex = m_templatesExisting->GetSelection();
+	if (selectionIndex == wxNOT_FOUND)
+	{
+		wxMessageBox("Please select a template to remove.", "No Template Selected", wxOK | wxICON_WARNING);
+		return;
+	}
+
+	// Get the selected template name and path
+	wxString selectedTemplateRelativeFilename = m_templatesExisting->GetString(selectionIndex);
+	wxString selectedTemplateAbsoluteFilename = m_mainFrame->m_tmap_userTemplates[selectedTemplateRelativeFilename];
+
+	// Ask the user for confirmation before deleting the file
+	wxString confirmationMessage = wxString::Format("Are you sure you want to permanently delete the template '%s'?\nThis action cannot be undone.", selectedTemplateAbsoluteFilename);
+	int response = wxMessageBox(confirmationMessage, "Confirm Deletion", wxOK | wxCANCEL | wxICON_WARNING);
+
+	if (response != wxOK)
+	{
+		// User canceled, so exit the function
+		return;
+	}
+
+	// Attempt to delete the file
+	if (wxRemoveFile(selectedTemplateAbsoluteFilename))
+	{
+		// Remove the deleted template from the map, update the wxChoice widget, clear the template editor textCtrl
+		// m_mainFrame->m_tmap_userTemplates.erase(selectedTemplateRelativeFilename);
+		m_mainFrame->m_tmap_userTemplates = m_mainFrame->ReadUserTemplates();
+		// m_templatesExisting->Delete(selectionIndex);
+		m_templatesExisting->SetSelection(wxNOT_FOUND);
+		m_templateEditor->Clear();
+		m_templateFileWasDeleted = true;
+		// update status bar to show successful deletion
+		m_templateEditorStatusBar->SetStatusText("Template file " + selectedTemplateAbsoluteFilename + " deleted");
+		m_mainFrame->UpdateTemplateChoices();
+	}
+	else
+	{
+		wxMessageBox(wxString::Format("Failed to delete template '%s'.", selectedTemplateRelativeFilename), "Error", wxOK | wxICON_ERROR);
+	}
 }
 
 void FlipTemplateEditor::OnClose(wxCloseEvent &event)
@@ -114,13 +160,13 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 	}
 
 	// // Get the selected template name
-	wxString selectedTemplateFilename = m_templatesExisting->GetString(selectionIndex);
+	wxString selectedTemplateRelativeFilename = m_templatesExisting->GetString(selectionIndex);
 
 	// Look up the corresponding file path in the m_tmap_userTemplates map
 	// dev-note: m_teCurrentTemplate is the absolute path and filename to the currently selected template file in Template Editor
-	m_teCurrentTemplate = m_mainFrame->m_tmap_userTemplates[selectedTemplateFilename];
+	m_teCurrentTemplate = m_mainFrame->m_tmap_userTemplates[selectedTemplateRelativeFilename];
 	std::cout << "Selected template path: " << m_teCurrentTemplate << '\n'
-			  << "Selected template name: " << selectedTemplateFilename << std::endl;
+			  << "Selected template name: " << selectedTemplateRelativeFilename << std::endl;
 
 	// // Check if template file exists
 	if (!wxFile::Exists(m_teCurrentTemplate))
@@ -157,10 +203,21 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 			  << templateContents << std::endl;
 	// Set the loaded content into m_templateEditor
 	m_templateEditor->SetValue(templateContents);
+	m_templateFileWasLoaded = true;
+	m_templateEditorStatusBar->SetStatusText(selectedTemplateRelativeFilename + " loaded");
 }
 
 void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 {
+	// pre-check. if templateFileWasDeleted or current teplate selection is blank, return out.
+	if (m_templateFileWasDeleted || m_templateFileWasLoaded || m_templatesExisting->GetCurrentSelection() == wxNOT_FOUND)
+	{
+		// Reset flags and return without doing anything
+		m_templateFileWasDeleted = false;
+		m_templateFileWasLoaded = false;
+		return;
+	}
+
 	if (!m_teCurrentTemplate.IsEmpty())
 	{
 		wxString statusMessage = wxEmptyString;
@@ -204,7 +261,7 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 			wxString rightSide = regexValidator.GetMatch(line, 2);
 
 			// Further processing with leftSide and rightSide can be done here
-			std::cout << "Valid regex: " << leftSide << " => " << rightSide << std::endl;
+			std::cout << "Valid regex: " << leftSide << "=> " << rightSide << std::endl;
 		}
 
 		if (isValid)
@@ -228,11 +285,16 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 		}
 		m_templateEditorStatusBar->SetStatusText(statusMessage);
 	}
+
 	m_teAutoSaveTimer.Stop(); // Stop the timer after saving
 }
 
 void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
 {
+	if (m_templateFileWasDeleted || m_templateFileWasLoaded || m_templatesExisting->GetSelection() == wxNOT_FOUND)
+	{
+		return;
+	}
 	m_templateEditorStatusBar->SetStatusText("Template content modified");
 	// if the auto save timer is running, reset it
 	if (m_teAutoSaveTimer.IsRunning())
@@ -252,8 +314,8 @@ void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
 	std::cout << "\tFlipTemplateEditor::m_templatesExisting wxChoices widget updated" << std::endl;
 	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
 	m_templatesExisting->Clear();
-	for (size_t i = 0; i < m_wxChoice_Templates->GetCount(); ++i)
+	for (size_t i = 0; i < m_wxChoicePtr_Templates->GetCount(); ++i)
 	{
-		m_templatesExisting->Append(m_wxChoice_Templates->GetString(i));
+		m_templatesExisting->Append(m_wxChoicePtr_Templates->GetString(i));
 	}
 }

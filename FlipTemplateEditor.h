@@ -19,18 +19,22 @@ public:
 	FlipTemplateEditor(FlipMain *parent);
 	//// end generated class members
 	void OnBtnAddTemplate(wxCommandEvent &event);
+	void OnBtnRemoveTemplate(wxCommandEvent &event);
 	void OnClose(wxCloseEvent &event);
 	void OnTemplateChoiceChanged(wxCommandEvent &event);
 	void OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event);
 	void OnTemplateEditorTextChanged(wxCommandEvent &event);
 	void OnTemplateListUpdated(wxCommandEvent &event);
 
-	wxChoice *m_wxChoice_Templates; // ptr to parent's wxChoice for templates
+	wxChoice *m_wxChoicePtr_Templates; // ptr to parent's wxChoice for templates
 private:
+	bool
+		m_templateFileWasDeleted = false,
+		m_templateFileWasLoaded = false;
 	FlipMain *m_mainFrame;
+	int m_teAutoSaveDelay = 2500;
 	wxString m_teCurrentTemplate;
 	wxTimer m_teAutoSaveTimer;
-	int m_teAutoSaveDelay = 2500;
 };
 
 #endif // __FlipTemplateEditor__

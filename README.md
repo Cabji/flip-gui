@@ -1,4 +1,5 @@
 # Overview
+
 This is a project to make the flip-cpp project into a GUI program.
 
 C++ with wxWidgets, UI being built using wxFormBuilder. The aim is to write cross-platform code.
@@ -10,7 +11,10 @@ If you want to build this project, you'll have to alter the CMakeLists.txt file 
 
 # Project Plans
 
-Here are some features I'd like to add eventually: 
- - Template Manager: add, remove, edit & validate template files
- - Side-by-side Data Comparison: view the processed data side by side at each step of processing
- - Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers
+Here are some features I'd like to add eventually:
+
+✔ Template Manager: add, remove, edit & validate template files
+
+- Core PDF processing functionality (copy & paste from flip-cpp (haw haw yeah that will work! /s))
+- Side-by-side Data Comparison: view the processed data side by side at each step of processing
+- Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers

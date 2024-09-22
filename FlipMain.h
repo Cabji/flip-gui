@@ -44,8 +44,10 @@ public:
 	// public members
 	static const wxString RESOURCE_MENU_ICONS_PATH;
 	const wxString
+		FLIP_USER_HOME_PATH,
 		FLIP_DEFAULT_CONFIG_PATH,
-		FLIP_DEFAULT_TEMPLATE_PATH;
+		FLIP_DEFAULT_TEMPLATE_PATH,
+		FLIP_DEFAULT_OUTPUT_FILENAME;
 	TemplateMap m_tmap_userTemplates;
 
 protected:
@@ -55,6 +57,7 @@ protected:
 private:
 	// event handlers
 	void OnAbout(wxCommandEvent &event);
+	void OnBtnLaunch(wxCommandEvent &event);
 	void OnUseTemplateChoice(wxCommandEvent &event);
 	void OnQuit(wxCommandEvent &event);
 	void OnShowProgramLog(wxCommandEvent &event);

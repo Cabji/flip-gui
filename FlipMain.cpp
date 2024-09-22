@@ -9,6 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/utils.h>
+#include <wx/wfstream.h>
 
 // define custom events
 wxDEFINE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
@@ -24,8 +25,10 @@ FlipMain::FlipMain(wxWindow *parent)
 FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) : Main(parent)
 {
     // defaults
+    const wxString FLIP_USER_HOME_PATH = wxGetHomeDir();
     const wxString FLIP_DEFAULT_CONFIG_PATH = wxGetHomeDir() + "/.flip";
     const wxString FLIP_DEFAULT_TEMPLATE_PATH = FLIP_DEFAULT_CONFIG_PATH + "/templates";
+    const wxString FLIP_DEFAULT_OUTPUT_FILENAME = "flipOutput.txt";
 
     //  create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);
@@ -43,6 +46,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
     Bind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
     // spcific widget binds
+    m_btnLaunch->Bind(wxEVT_BUTTON, &FlipMain::OnBtnLaunch, this);
     m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnUseTemplateChoice, this);
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
 
@@ -129,6 +133,78 @@ void FlipMain::OnAbout(wxCommandEvent &event)
     wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
 }
 
+void FlipMain::OnBtnLaunch(wxCommandEvent &event)
+{
+    // Initialize local data & verify user input values
+    bool success = true;
+    wxString checkThese;
+
+    // 1. Validate m_inputFile (wxFilePickerCtrl)
+    wxString inputFilePath = m_inputFile->GetPath();
+    if (inputFilePath.IsEmpty())
+    {
+        checkThese << "Input file is empty\n";
+        success = false;
+    }
+    else if (!wxFile::Exists(inputFilePath))
+    {
+        checkThese << "Input file does not exist\n";
+        success = false;
+    }
+
+    // 2. Validate m_useTemplate (wxChoice)
+    int templateSelectionIndex = m_useTemplate->GetSelection();
+    if (templateSelectionIndex == wxNOT_FOUND)
+    {
+        checkThese << "No template selected\n";
+        success = false;
+    }
+    else
+    {
+        // Get the template file path using the template selection
+        wxString selectedTemplateFilename = m_useTemplate->GetString(templateSelectionIndex);
+        wxString templateFilePath = m_tmap_userTemplates[selectedTemplateFilename];
+
+        if (!wxFile::Exists(templateFilePath))
+        {
+            checkThese << "Template file does not exist/is inaccessible\n";
+            success = false;
+        }
+    }
+
+    // 3. Validate m_outputFile (wxFilePickerCtrl) or use a default output path
+    wxString outputFilePath = m_outputFile->GetPath();
+    if (outputFilePath.IsEmpty())
+    {
+        // If no output file provided, use the default output path in the user's home directory
+        wxString defaultOutputFilePath = wxString::Format("%s/%s", FLIP_USER_HOME_PATH, FLIP_DEFAULT_OUTPUT_FILENAME);
+        outputFilePath = defaultOutputFilePath;
+        checkThese << "No output filename given, using default: " << FLIP_DEFAULT_OUTPUT_FILENAME << "\n";
+    }
+    else
+    {
+        // Check if the file can be created by attempting to open it for writing
+        wxFileOutputStream outputStream(outputFilePath);
+        if (!outputStream.IsOk())
+        {
+            checkThese << "Output file is unwriteable/inaccessible\n";
+            success = false;
+        }
+    }
+
+    // If any validation failed, return early
+    if (!success)
+    {
+        wxMessageBox("Required values missing. Please check the following and try again: \n\n" + checkThese, "Required information missing", wxOK | wxICON_WARNING);
+        return;
+    }
+
+    // At this point, all validations passed, and we can proceed with core processing
+    wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
+
+    // Core processing logic goes here, using:
+    // inputFilePath, templateFilePath, and outputFilePath
+}
 void FlipMain::OnQuit(wxCommandEvent &event)
 {
     Close(true);

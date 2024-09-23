@@ -34,6 +34,7 @@ public:
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
 	void LogMessage(wxString message);
+	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();
 	void UpdateTemplateChoices();
 
@@ -43,11 +44,10 @@ public:
 
 	// public members
 	static const wxString RESOURCE_MENU_ICONS_PATH;
-	const wxString
-		FLIP_USER_HOME_PATH,
-		FLIP_DEFAULT_CONFIG_PATH,
-		FLIP_DEFAULT_TEMPLATE_PATH,
-		FLIP_DEFAULT_OUTPUT_FILENAME;
+	const wxString FLIP_USER_HOME_PATH;
+	const wxString FLIP_DEFAULT_CONFIG_PATH;
+	const wxString FLIP_DEFAULT_TEMPLATE_PATH;
+	const wxString FLIP_DEFAULT_OUTPUT_FILENAME;
 	TemplateMap m_tmap_userTemplates;
 
 protected:

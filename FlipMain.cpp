@@ -22,13 +22,15 @@ FlipMain::FlipMain(wxWindow *parent)
 {
 }
 
-FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) : Main(parent)
+FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style)
+    : Main(parent),
+      FLIP_USER_HOME_PATH(wxGetHomeDir()),
+      FLIP_DEFAULT_CONFIG_PATH(wxGetHomeDir() + "/.flip"),
+      FLIP_DEFAULT_TEMPLATE_PATH(wxGetHomeDir() + "/.flip/templates"),
+      FLIP_DEFAULT_OUTPUT_FILENAME("flipOutput.txt")
 {
-    // defaults
-    const wxString FLIP_USER_HOME_PATH = wxGetHomeDir();
-    const wxString FLIP_DEFAULT_CONFIG_PATH = wxGetHomeDir() + "/.flip";
-    const wxString FLIP_DEFAULT_TEMPLATE_PATH = FLIP_DEFAULT_CONFIG_PATH + "/templates";
-    const wxString FLIP_DEFAULT_OUTPUT_FILENAME = "flipOutput.txt";
+    // dev-note: const class members must be declared in the constructor's initialiation list
+    //           not in the constructor body. (allegedly)
 
     //  create a FlipProgramLog <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_programLog = std::make_unique<FlipProgramLog>(this);
@@ -128,6 +130,19 @@ void FlipMain::LogMessage(wxString message)
     }
 }
 
+bool FlipMain::NormalizeFilePathString(wxString &path)
+{
+    bool success = false;
+    if (!path.IsEmpty())
+    {
+        wxFileName wxfnPath(path);
+        wxfnPath.Normalize(wxPATH_NORM_DOTS | wxPATH_NORM_ABSOLUTE);
+        path = wxfnPath.GetFullPath();
+        success = true;
+    }
+    return success;
+}
+
 void FlipMain::OnAbout(wxCommandEvent &event)
 {
     wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
@@ -177,9 +192,10 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     if (outputFilePath.IsEmpty())
     {
         // If no output file provided, use the default output path in the user's home directory
-        wxString defaultOutputFilePath = wxString::Format("%s/%s", FLIP_USER_HOME_PATH, FLIP_DEFAULT_OUTPUT_FILENAME);
+        wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
         outputFilePath = defaultOutputFilePath;
-        checkThese << "No output filename given, using default: " << FLIP_DEFAULT_OUTPUT_FILENAME << "\n";
+        NormalizeFilePathString(defaultOutputFilePath);
+        checkThese << "No output filename given, using default: " + defaultOutputFilePath + "\n";
     }
     else
     {

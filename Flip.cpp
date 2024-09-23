@@ -86,7 +86,7 @@ Main::Main( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoin
 	m_lblUseTemplate->Wrap( -1 );
 	m_mainFrameSizer->Add( m_lblUseTemplate, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-	m_btnLaunch = new wxButton( this, wxID_ANY, _("LAUNCH"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btnLaunch = new wxButton( this, flipID_MAIN_BTN_LAUNCH, _("LAUNCH"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_mainFrameSizer->Add( m_btnLaunch, wxGBPosition( 4, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
 

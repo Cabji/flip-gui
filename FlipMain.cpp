@@ -7,11 +7,17 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
+#include <wx/regex.h>
 #include <wx/stdpaths.h>
+#include <wx/string.h>
+#include <wx/textfile.h>
 #include <wx/utils.h>
+#include <wx/vector.h>
 #include <wx/wfstream.h>
 
-// define custom events
+// define custom data types & events
+// type to hold regex and substitution string pairs
+typedef wxVector<std::pair<wxString, wxString>> RegexSubstitutionList;
 wxDEFINE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
 
 // dev-note: if you add resource const values, ensure they prepend with leading / char
@@ -218,6 +224,16 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // At this point, all validations passed, and we can proceed with core processing
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
 
+    // create local data types/variables that will hold:
+    // a regex string and it's substitution value. these values will be read from templateFilePath.
+    // in templateFilePath, they are stored 1 set per line, in the format: regex string => substitution string
+    // ensure that the order that the regexes are stored in the template file are maintained in the data structure used as order of precedence is required later
+    // you should use wx data types if it's recommended, easier or simpler.
+
+    // write a loop that will read the content of the file at templateFilePath line by line,
+    // analyze each line as it's read. use a call to fnIgnoreLine() to determine if the line should be ignored or not.
+    // if the line should NOT be ignored,
+
     // Core processing logic goes here, using:
     // inputFilePath, templateFilePath, and outputFilePath
 }
@@ -420,4 +436,39 @@ void FlipMain::UpdateTemplateChoices()
     // update the Template Editor wxChoice widget by triggering FlipTemplateEditor::OnTemplateListUpdated with a wxCommandEvent
     wxCommandEvent event;
     m_templateEditor->OnTemplateListUpdated(event);
+}
+
+void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
+{
+    wxTextFile file(templateFilePath);
+    if (!file.Open())
+    {
+        std::cout << "Unable to open template file: " << templateFilePath << std::endl;
+        LogMessage("Core: Unable to open template file: " + templateFilePath);
+        return;
+    }
+
+    wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
+    wxRegEx regexValidator(regexPattern);
+
+    for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine())
+    {
+        line = line.Trim(true).Trim(false); // Trim whitespace
+
+        if (regexValidator.Matches(line))
+        {
+            wxString regexString = regexValidator.GetMatch(line, 1);
+            wxString substitutionString = regexValidator.GetMatch(line, 2);
+
+            // Add the pair to the list
+            regexList.push_back(std::make_pair(regexString, substitutionString));
+        }
+        else
+        {
+            std::cout << "Invalid line in template file: " << line << std::endl;
+            LogMessage("Invalid regex in template file: " + line);
+        }
+    }
+
+    file.Close();
 }

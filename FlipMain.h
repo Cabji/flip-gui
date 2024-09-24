@@ -67,6 +67,7 @@ private:
 	void OnTemplateFilePoll(wxTimerEvent &event);
 
 	// private methods
+	void LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList);
 	void SetupMenuIcons(wxMenu *menu);
 
 	// private members

@@ -20,6 +20,7 @@ add_executable(FlipApp
     FlipMain.cpp 
     FlipProgramLog.cpp
     FlipTemplateEditor.cpp
+    cabjiFunctions.cpp
     app.manifest  
 )
 

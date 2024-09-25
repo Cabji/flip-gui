@@ -1,6 +1,8 @@
 #include "FlipMain.h"
 #include "FlipProgramLog.h"
 #include "FlipTemplateEditor.h"
+#include <poppler/cpp/poppler-document.h>
+#include <poppler/cpp/poppler-page.h>
 #include <wx/bitmap.h>
 #include <wx/bmpbndl.h>
 #include <wx/datetime.h>
@@ -224,13 +226,67 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
     // At this point, all validations passed, and we can proceed with core processing
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
+
+    // *************** Start Core Program Functionality ***************
     RegexSubstitutionList regexList;
+    // get regexes from template
     LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
+    // open input PDF file
+    poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
+    if (!inPDF)
+    {
+        std::cout << "Error: could not open input file '" << inputFilePath << "'" << std::endl;
+        return;
+    }
 
-    // write a loop that will read the content of the file at templateFilePath line by line,
-    // analyze each line as it's read. use a call to fnIgnoreLine() to determine if the line should be ignored or not.
-    // if the line should NOT be ignored,
+    // get text data from PDF file
+    std::vector<std::string> vec_PDFPages;
+    auto numPages = inPDF->pages();
 
+    std::cout << "Reading text data from PDF file..." << std::endl;
+    // iterate the pages and extract text data into vec_PDFPageStrings
+    for (auto i = 0; i < numPages; ++i)
+    {
+        // per-page processing: to be added
+        // if (processPages.find(i) != processPages.end())
+        // {
+        // cout << "Processing page " << i << endl;
+        // Process this page
+
+        poppler::page *inPDFPage = inPDF->create_page(i);
+        if (!inPDFPage)
+        {
+            std::cout << "Could not create poppler::page object, index: " << i << std::endl;
+            continue;
+        }
+
+        // Extract text and ensure it's not null
+        auto textData = inPDFPage->text().to_utf8();
+        std::string pageText(textData.data(), textData.size());
+
+        fnStrNormalizeNewLineChars(pageText);
+        // strip whitespace: to be added
+        // if (stripWhitespace)
+        // {
+        //     pageText = fnStrStripExcessiveWhitespace(pageText);
+        // }
+
+        // Show Data Before Proessing -dbp: to be added
+        // if (bShowDataBeforeProcessing)
+        // {
+        //     cout << "Data Before Processing - Page " << i << endl;
+        //     cout << pageText << endl;
+        // }
+
+        vec_PDFPages.push_back(pageText);
+        delete inPDFPage;
+        // }
+        // else
+        // {
+        //     cout << "Skipping page " << i << endl;
+        //     // Do not process this page
+        // }
+    }
     // Core processing logic goes here, using:
     // inputFilePath, templateFilePath, and outputFilePath
 }

@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/cpp/cppLibraries/wxWidgets_static/lib/gcc_x64_lib/mswu",
-                "C:/cpp/cppLibraries/wxWidgets_static/include"
+                "C:/cpp/cppLibraries/wxWidgets_static/include", 
+                "C:/cpp/cppLibraries/poppler-24.02.0/Library/include/poppler"
             ],
             "defines": [
                 "_WINDOWS",

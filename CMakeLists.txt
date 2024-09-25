@@ -12,6 +12,10 @@ set(wxWidgets_INCLUDE_DIRS
 set(CMAKE_CXX_FLAGS "-mwindows")
 
 find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
+# Link against Poppler libraries
+find_library(POPPLER_LIB poppler REQUIRED HINTS "C:/cpp/msys64/ucrt64/lib")
+find_library(POPPLER_CPP_LIB poppler-cpp REQUIRED HINTS "C:/cpp/msys64/ucrt64/lib")
+
 include(${wxWidgets_USE_FILE})
 
 add_executable(FlipApp 
@@ -25,7 +29,7 @@ add_executable(FlipApp
 )
 
 target_include_directories(FlipApp PRIVATE ${wxWidgets_INCLUDE_DIRS})
-target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES} dwmapi)
+target_link_libraries(FlipApp PRIVATE ${wxWidgets_LIBRARIES} ${POPPLER_LIB} ${POPPLER_CPP_LIB})
 
 # Define the source and destination resource directories
 set(RESOURCE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources")

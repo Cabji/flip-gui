@@ -159,6 +159,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // Initialize local data & verify user input values
     bool success = true;
     wxString checkThese;
+    wxString templateFileAbsolutePath;
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
@@ -184,9 +185,9 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     {
         // Get the template file path using the template selection
         wxString selectedTemplateFilename = m_useTemplate->GetString(templateSelectionIndex);
-        wxString templateFilePath = m_tmap_userTemplates[selectedTemplateFilename];
+        templateFileAbsolutePath = m_tmap_userTemplates[selectedTemplateFilename];
 
-        if (!wxFile::Exists(templateFilePath))
+        if (!wxFile::Exists(templateFileAbsolutePath))
         {
             checkThese << "Template file does not exist/is inaccessible\n";
             success = false;
@@ -223,12 +224,8 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
     // At this point, all validations passed, and we can proceed with core processing
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
-
-    // create local data types/variables that will hold:
-    // a regex string and it's substitution value. these values will be read from templateFilePath.
-    // in templateFilePath, they are stored 1 set per line, in the format: regex string => substitution string
-    // ensure that the order that the regexes are stored in the template file are maintained in the data structure used as order of precedence is required later
-    // you should use wx data types if it's recommended, easier or simpler.
+    RegexSubstitutionList regexList;
+    LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
 
     // write a loop that will read the content of the file at templateFilePath line by line,
     // analyze each line as it's read. use a call to fnIgnoreLine() to determine if the line should be ignored or not.
@@ -237,6 +234,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // Core processing logic goes here, using:
     // inputFilePath, templateFilePath, and outputFilePath
 }
+
 void FlipMain::OnQuit(wxCommandEvent &event)
 {
     Close(true);
@@ -455,18 +453,23 @@ void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, Rege
     {
         line = line.Trim(true).Trim(false); // Trim whitespace
 
-        if (regexValidator.Matches(line))
+        if (!fnIgnoreLine(line.ToStdString()))
         {
-            wxString regexString = regexValidator.GetMatch(line, 1);
-            wxString substitutionString = regexValidator.GetMatch(line, 2);
+            if (regexValidator.Matches(line))
+            {
+                wxString regexString = regexValidator.GetMatch(line, 1);
+                wxString substitutionString = regexValidator.GetMatch(line, 2);
 
-            // Add the pair to the list
-            regexList.push_back(std::make_pair(regexString, substitutionString));
-        }
-        else
-        {
-            std::cout << "Invalid line in template file: " << line << std::endl;
-            LogMessage("Invalid regex in template file: " + line);
+                // Add the pair to the list
+                regexList.push_back(std::make_pair(regexString, substitutionString));
+                std::cout << "Valid regex in template file: " << line << std::endl;
+                LogMessage("Valid regex in template file: " + line);
+            }
+            else
+            {
+                std::cout << "Invalid regex in template file: " << line << std::endl;
+                LogMessage("Invalid regex in template file: " + line);
+            }
         }
     }
 

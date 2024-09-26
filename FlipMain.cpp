@@ -228,6 +228,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
 
     // *************** Start Core Program Functionality ***************
+    std::set<int> processPages;
     RegexSubstitutionList regexList;
     // get regexes from template
     LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
@@ -280,6 +281,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
         vec_PDFPages.push_back(pageText);
         delete inPDFPage;
+
         // }
         // else
         // {
@@ -287,8 +289,10 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         //     // Do not process this page
         // }
     }
-    // Core processing logic goes here, using:
-    // inputFilePath, templateFilePath, and outputFilePath
+    int pagesProcessed = vec_PDFPages.size();
+
+    // temporary output message:
+    LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

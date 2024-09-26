@@ -136,6 +136,10 @@ void FlipMain::LogMessage(wxString message)
     {
         m_programLog->LogMessage(message);
     }
+    if (m_useConsoleOutput)
+    {
+        std::cout << message << std::endl;
+    }
 }
 
 bool FlipMain::NormalizeFilePathString(wxString &path)
@@ -221,21 +225,21 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // 4. process switches
     // 4a. Per page processing input validation
     std::string pageRangeString = m_ProcessPages->GetValue().ToStdString();
-    std::cout << "[-p] User Defined Page Processing" << std::endl;
+    LogMessage("[-p] User Defined Page Processing");
     try
     {
         processPages = fnParsePageSelection(pageRangeString);
-        std::cout << "Only process pages: ";
+        wxString tempOutput;
+        tempOutput << "Only process pages: ";
         for (const int page : processPages)
         {
-            std::cout << page << " ";
+            tempOutput << page << " ";
         }
+        LogMessage(tempOutput);
     }
     catch (const std::exception &e)
     {
-        std::cout << "Runtime problem detected! Page process values are causing a problem so quitting.\n"
-                  << "Check your -p/--page argument values are correct (or did you forget to put an input filename?) and try again.\n"
-                  << "Caught Error: " << e.what();
+        LogMessage("Runtime problem detected! Page process values are causing a problem so quitting.\n" + "Check your -p/--page argument values are correct (or did you forget to put an input filename?) and try again.\n" + "Caught Error: " + e.what());
     }
 
     // If any validation failed, return early
@@ -437,6 +441,11 @@ TemplateMap FlipMain::ReadUserTemplates()
     }
 
     return returnVals;
+}
+
+void FlipMain::SetUseConsoleOutput(const bool v)
+{
+    m_useConsoleOutput = v;
 }
 
 void FlipMain::SetupMenuIcons(wxMenu *menu)

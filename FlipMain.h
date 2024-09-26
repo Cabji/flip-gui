@@ -39,6 +39,7 @@ public:
 	void LogMessage(wxString message);
 	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();
+	void SetUseConsoleOutput(const bool v);
 	void UpdateTemplateChoices();
 
 	// widget related methods
@@ -73,6 +74,7 @@ private:
 	void SetupMenuIcons(wxMenu *menu);
 
 	// private members
+	bool m_useConsoleOutput = false;
 	wxArrayString m_configTemplateDirs;
 	wxTimer m_filePollTimer;
 };

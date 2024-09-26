@@ -160,6 +160,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 {
     // Initialize local data & verify user input values
     bool success = true;
+    std::set<int> processPages;
     wxString checkThese;
     wxString templateFileAbsolutePath;
 
@@ -217,6 +218,26 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         }
     }
 
+    // 4. process switches
+    // 4a. Per page processing input validation
+    std::string pageRangeString = m_ProcessPages->GetValue().ToStdString();
+    std::cout << "[-p] User Defined Page Processing" << std::endl;
+    try
+    {
+        processPages = fnParsePageSelection(pageRangeString);
+        std::cout << "Only process pages: ";
+        for (const int page : processPages)
+        {
+            std::cout << page << " ";
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Runtime problem detected! Page process values are causing a problem so quitting.\n"
+                  << "Check your -p/--page argument values are correct (or did you forget to put an input filename?) and try again.\n"
+                  << "Caught Error: " << e.what();
+    }
+
     // If any validation failed, return early
     if (!success)
     {
@@ -228,7 +249,6 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
 
     // *************** Start Core Program Functionality ***************
-    std::set<int> processPages;
     RegexSubstitutionList regexList;
     // get regexes from template
     LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);

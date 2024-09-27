@@ -166,17 +166,18 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     bool success = true;
     std::set<int> processPages;
     wxString templateFileAbsolutePath;
+    int problemCount = 1;
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
     if (inputFilePath.IsEmpty())
     {
-        m_tempOutput << "Input file is empty\n";
+        m_tempOutput << problemCount++ << ". Input file is empty\n";
         success = false;
     }
     else if (!wxFile::Exists(inputFilePath))
     {
-        m_tempOutput << "Input file does not exist\n";
+        m_tempOutput << problemCount++ << ". Input file does not exist\n";
         success = false;
     }
 
@@ -184,7 +185,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     int templateSelectionIndex = m_useTemplate->GetSelection();
     if (templateSelectionIndex == wxNOT_FOUND)
     {
-        m_tempOutput << "No template selected\n";
+        m_tempOutput << problemCount++ << ". No template selected\n";
         success = false;
     }
     else
@@ -195,7 +196,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
         if (!wxFile::Exists(templateFileAbsolutePath))
         {
-            m_tempOutput << "Template file does not exist/is inaccessible\n";
+            m_tempOutput << problemCount++ << ". Template file does not exist/is inaccessible\n";
             success = false;
         }
     }
@@ -208,7 +209,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
         outputFilePath = defaultOutputFilePath;
         NormalizeFilePathString(defaultOutputFilePath);
-        m_tempOutput << "No output filename given, using default: " + defaultOutputFilePath + "\n";
+        m_tempOutput << problemCount++ << ". No output filename given, using default: " + defaultOutputFilePath + "\n";
     }
     else
     {
@@ -216,7 +217,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         wxFileOutputStream outputStream(outputFilePath);
         if (!outputStream.IsOk())
         {
-            m_tempOutput << "Output file is unwriteable/inaccessible\n";
+            m_tempOutput << problemCount++ << ". Output file is unwriteable/inaccessible\n";
             success = false;
         }
     }
@@ -224,7 +225,24 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // 4. process switches
     // 4a. Per page processing input validation
     std::string pageRangeString = m_ProcessPages->GetValue().ToStdString();
-    processPages = fnParsePageSelection(pageRangeString);
+    // only attempt per-page processing if the user input something into the widget
+    if (!pageRangeString.empty())
+    {
+        processPages = fnParsePageSelection(pageRangeString);
+        if (processPages.empty())
+        {
+            m_tempOutput << problemCount++ << ". Page processing string is invalid. Hover cursor over widget to get help tips\n";
+            success = false;
+        }
+        wxString outStr = "Number of pages to be processed: " + std::to_string(processPages.size()) + " (Pages: ";
+        for (int pageNum : processPages)
+        {
+            outStr << pageNum << ",";
+        }
+        outStr.RemoveLast() << ")";
+        LogMessage(outStr);
+    }
+
     // m_tempOutput << "Only process pages: ";
     // for (const int page : processPages)
     // {
@@ -236,6 +254,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     if (!success)
     {
         wxMessageBox("Required values missing. Please check the following and try again: \n\n" + m_tempOutput, "Required information missing", wxOK | wxICON_WARNING);
+        m_tempOutput = wxEmptyString;
         return;
     }
 

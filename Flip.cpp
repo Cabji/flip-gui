@@ -55,6 +55,8 @@ Main::Main( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoin
 	m_switchesSizer->Add( m_lblProcessPages, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_ProcessPages = new wxTextCtrl( m_groupSwitches->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_ProcessPages->SetToolTip( _("Page Processing\n\nYou can define which pages in the PDF file will be processed.\n\nExamples: \n1,2,3 will process only pages 1, 2 and 3\n2,4,6-10 will process pages 2, 4, 6, 7, 8, 9 and 10\n15-9 will process pages 9, 10, 11, 12, 13, 14 and 15\n\nWhitespaces are ignored. ") );
+
 	m_switchesSizer->Add( m_ProcessPages, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
 

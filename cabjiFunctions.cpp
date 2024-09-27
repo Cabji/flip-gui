@@ -10,6 +10,22 @@ bool fnIgnoreLine(const std::string &str)
 std::set<int> fnParsePageSelection(const std::string &pageSelection)
 {
 	std::set<int> pages;
+
+	// Check if pageSelection contains only allowed characters: digits, commas, dashes, and spaces
+	std::regex validPattern("^[0-9,\\-\\s]*$");
+	if (!std::regex_match(pageSelection, validPattern))
+	{
+		std::cout << "Error: Invalid characters in page selection string.\n";
+		return pages; // Return empty set if invalid characters are found
+	}
+
+	if (pageSelection.empty())
+	{
+		std::cout << "Error: Empty page selection string.\n";
+		return pages; // Return empty set for empty input
+	}
+
+	// Split the input string by commas to get the elements
 	std::vector<std::string> elements = fnStrSplitToVector(pageSelection, ",");
 
 	for (const auto &element : elements)
@@ -22,25 +38,54 @@ std::set<int> fnParsePageSelection(const std::string &pageSelection)
 			std::vector<std::string> range = fnStrSplitToVector(trimmedElement, "-");
 			if (range.size() != 2)
 			{
-				throw std::invalid_argument("Invalid range: " + trimmedElement);
+				std::cout << "Error: Invalid range in page selection: " << trimmedElement << "\n";
+				return pages; // Return empty set if range is invalid
 			}
 
-			int start = std::stoi(range[0]);
-			int end = std::stoi(range[1]);
-			if (start > end)
-				std::swap(start, end); // Ensure start is less than end
-
-			for (int i = start; i <= end; ++i)
+			try
 			{
-				pages.insert(i);
+				int start = std::stoi(range[0]);
+				int end = std::stoi(range[1]);
+
+				if (start > end)
+					std::swap(start, end); // Ensure start is less than or equal to end
+
+				for (int i = start; i <= end; ++i)
+				{
+					pages.insert(i);
+				}
+			}
+			catch (const std::invalid_argument &e)
+			{
+				std::cout << "Error: Invalid number format in range: " << e.what() << "\n";
+				return pages;
+			}
+			catch (const std::out_of_range &e)
+			{
+				std::cout << "Error: Number out of range: " << e.what() << "\n";
+				return pages;
 			}
 		}
 		else
 		{
 			// Process single number
-			pages.insert(std::stoi(trimmedElement));
+			try
+			{
+				pages.insert(std::stoi(trimmedElement));
+			}
+			catch (const std::invalid_argument &e)
+			{
+				std::cout << "Error: Invalid number format: " << e.what() << "\n";
+				return pages;
+			}
+			catch (const std::out_of_range &e)
+			{
+				std::cout << "Error: Number out of range: " << e.what() << "\n";
+				return pages;
+			}
 		}
 	}
+
 	return pages;
 }
 

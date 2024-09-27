@@ -225,12 +225,12 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // 4a. Per page processing input validation
     std::string pageRangeString = m_ProcessPages->GetValue().ToStdString();
     processPages = fnParsePageSelection(pageRangeString);
-    m_tempOutput << "Only process pages: ";
-    for (const int page : processPages)
-    {
-        m_tempOutput << page << " ";
-    }
-    LogMessage(m_tempOutput);
+    // m_tempOutput << "Only process pages: ";
+    // for (const int page : processPages)
+    // {
+    //     m_tempOutput << page << " ";
+    // }
+    // LogMessage(m_tempOutput);
 
     // If any validation failed, return early
     if (!success)
@@ -247,66 +247,66 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // get regexes from template
     LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
     // open input PDF file
-    poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
-    if (!inPDF)
-    {
-        LogMessage("Error: could not open input file '" + inputFilePath + "'");
-        return;
-    }
+    // poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
+    // if (!inPDF)
+    // {
+    //     LogMessage("Error: could not open input file '" + inputFilePath + "'");
+    //     return;
+    // }
 
-    // get text data from PDF file
-    std::vector<std::string> vec_PDFPages;
-    auto numPages = inPDF->pages();
+    // // get text data from PDF file
+    // std::vector<std::string> vec_PDFPages;
+    // auto numPages = inPDF->pages();
 
-    LogMessage("Reading text data from PDF file...");
-    // iterate the pages and extract text data into vec_PDFPageStrings
-    for (auto i = 0; i < numPages; ++i)
-    {
-        // per-page processing: to be added
-        // if (processPages.find(i) != processPages.end())
-        // {
-        // cout << "Processing page " << i << endl;
-        // Process this page
+    // LogMessage("Reading text data from PDF file...");
+    // // iterate the pages and extract text data into vec_PDFPageStrings
+    // for (auto i = 0; i < numPages; ++i)
+    // {
+    //     // per-page processing: to be added
+    //     // if (processPages.find(i) != processPages.end())
+    //     // {
+    //     // cout << "Processing page " << i << endl;
+    //     // Process this page
 
-        poppler::page *inPDFPage = inPDF->create_page(i);
-        if (!inPDFPage)
-        {
-            LogMessage("Could not create poppler::page object, index: " + i);
-            continue;
-        }
+    //     poppler::page *inPDFPage = inPDF->create_page(i);
+    //     if (!inPDFPage)
+    //     {
+    //         LogMessage("Could not create poppler::page object, index: " + i);
+    //         continue;
+    //     }
 
-        // Extract text and ensure it's not null
-        auto textData = inPDFPage->text().to_utf8();
-        std::string pageText(textData.data(), textData.size());
+    //     // Extract text and ensure it's not null
+    //     auto textData = inPDFPage->text().to_utf8();
+    //     std::string pageText(textData.data(), textData.size());
 
-        fnStrNormalizeNewLineChars(pageText);
-        // strip whitespace: to be added
-        // if (stripWhitespace)
-        // {
-        //     pageText = fnStrStripExcessiveWhitespace(pageText);
-        // }
+    //     fnStrNormalizeNewLineChars(pageText);
+    //     // strip whitespace: to be added
+    //     // if (stripWhitespace)
+    //     // {
+    //     //     pageText = fnStrStripExcessiveWhitespace(pageText);
+    //     // }
 
-        // Show Data Before Proessing -dbp: to be added
-        // if (bShowDataBeforeProcessing)
-        // {
-        //     cout << "Data Before Processing - Page " << i << endl;
-        //     cout << pageText << endl;
-        // }
+    //     // Show Data Before Proessing -dbp: to be added
+    //     // if (bShowDataBeforeProcessing)
+    //     // {
+    //     //     cout << "Data Before Processing - Page " << i << endl;
+    //     //     cout << pageText << endl;
+    //     // }
 
-        vec_PDFPages.push_back(pageText);
-        delete inPDFPage;
+    //     vec_PDFPages.push_back(pageText);
+    //     delete inPDFPage;
 
-        // }
-        // else
-        // {
-        //     cout << "Skipping page " << i << endl;
-        //     // Do not process this page
-        // }
-    }
-    int pagesProcessed = vec_PDFPages.size();
+    //     // }
+    //     // else
+    //     // {
+    //     //     cout << "Skipping page " << i << endl;
+    //     //     // Do not process this page
+    //     // }
+    // }
+    // int pagesProcessed = vec_PDFPages.size();
 
-    // temporary output message:
-    LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
+    // // temporary output message:
+    // LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

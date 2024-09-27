@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <iostream>
+#include <regex>
 #include <set>
 #include <stdexcept>
 #include <string>

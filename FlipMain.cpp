@@ -165,19 +165,18 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // Initialize local data & verify user input values
     bool success = true;
     std::set<int> processPages;
-    wxString checkThese;
     wxString templateFileAbsolutePath;
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
     if (inputFilePath.IsEmpty())
     {
-        checkThese << "Input file is empty\n";
+        m_tempOutput << "Input file is empty\n";
         success = false;
     }
     else if (!wxFile::Exists(inputFilePath))
     {
-        checkThese << "Input file does not exist\n";
+        m_tempOutput << "Input file does not exist\n";
         success = false;
     }
 
@@ -185,7 +184,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     int templateSelectionIndex = m_useTemplate->GetSelection();
     if (templateSelectionIndex == wxNOT_FOUND)
     {
-        checkThese << "No template selected\n";
+        m_tempOutput << "No template selected\n";
         success = false;
     }
     else
@@ -196,7 +195,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
         if (!wxFile::Exists(templateFileAbsolutePath))
         {
-            checkThese << "Template file does not exist/is inaccessible\n";
+            m_tempOutput << "Template file does not exist/is inaccessible\n";
             success = false;
         }
     }
@@ -209,7 +208,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
         outputFilePath = defaultOutputFilePath;
         NormalizeFilePathString(defaultOutputFilePath);
-        checkThese << "No output filename given, using default: " + defaultOutputFilePath + "\n";
+        m_tempOutput << "No output filename given, using default: " + defaultOutputFilePath + "\n";
     }
     else
     {
@@ -217,7 +216,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         wxFileOutputStream outputStream(outputFilePath);
         if (!outputStream.IsOk())
         {
-            checkThese << "Output file is unwriteable/inaccessible\n";
+            m_tempOutput << "Output file is unwriteable/inaccessible\n";
             success = false;
         }
     }
@@ -225,27 +224,18 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // 4. process switches
     // 4a. Per page processing input validation
     std::string pageRangeString = m_ProcessPages->GetValue().ToStdString();
-    LogMessage("[-p] User Defined Page Processing");
-    try
+    processPages = fnParsePageSelection(pageRangeString);
+    m_tempOutput << "Only process pages: ";
+    for (const int page : processPages)
     {
-        processPages = fnParsePageSelection(pageRangeString);
-        wxString tempOutput;
-        tempOutput << "Only process pages: ";
-        for (const int page : processPages)
-        {
-            tempOutput << page << " ";
-        }
-        LogMessage(tempOutput);
+        m_tempOutput << page << " ";
     }
-    catch (const std::exception &e)
-    {
-        LogMessage("Runtime problem detected! Page process values are causing a problem so quitting.\n" + "Check your -p/--page argument values are correct (or did you forget to put an input filename?) and try again.\n" + "Caught Error: " + e.what());
-    }
+    LogMessage(m_tempOutput);
 
     // If any validation failed, return early
     if (!success)
     {
-        wxMessageBox("Required values missing. Please check the following and try again: \n\n" + checkThese, "Required information missing", wxOK | wxICON_WARNING);
+        wxMessageBox("Required values missing. Please check the following and try again: \n\n" + m_tempOutput, "Required information missing", wxOK | wxICON_WARNING);
         return;
     }
 
@@ -260,7 +250,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
     if (!inPDF)
     {
-        std::cout << "Error: could not open input file '" << inputFilePath << "'" << std::endl;
+        LogMessage("Error: could not open input file '" + inputFilePath + "'");
         return;
     }
 
@@ -268,7 +258,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     std::vector<std::string> vec_PDFPages;
     auto numPages = inPDF->pages();
 
-    std::cout << "Reading text data from PDF file..." << std::endl;
+    LogMessage("Reading text data from PDF file...");
     // iterate the pages and extract text data into vec_PDFPageStrings
     for (auto i = 0; i < numPages; ++i)
     {
@@ -281,7 +271,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         poppler::page *inPDFPage = inPDF->create_page(i);
         if (!inPDFPage)
         {
-            std::cout << "Could not create poppler::page object, index: " << i << std::endl;
+            LogMessage("Could not create poppler::page object, index: " + i);
             continue;
         }
 
@@ -328,7 +318,7 @@ void FlipMain::OnShowProgramLog(wxCommandEvent &event)
 {
     if (m_programLog)
     {
-        std::cout << "Showing Program Log window" << std::endl;
+        LogMessage("Showing Program Log window");
         m_programLog->Show(true);
     }
 }
@@ -337,7 +327,7 @@ void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
 {
     if (m_templateEditor)
     {
-        std::cout << "Showing Template Editor window" << std::endl;
+        LogMessage("Showing Template Editor window");
         m_templateEditor->Show(true);
     }
 }
@@ -373,7 +363,7 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
 
         if (currentFileState.find(pair.first) == currentFileState.end())
         {
-            std::cout << "File deleted: " << pair.second << std::endl;
+            LogMessage("File deleted: " + pair.second);
             hasChanges = true;
         }
     }
@@ -387,7 +377,7 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
 
         if (m_tmap_userTemplates.find(pair.first) == m_tmap_userTemplates.end())
         {
-            std::cout << "File added: " << pair.second << std::endl;
+            LogMessage("File added: " + pair.second);
             hasChanges = true;
         }
     }
@@ -395,7 +385,7 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
     // If there were changes, update m_tmap_userTemplates and the wxChoice widgets
     if (hasChanges)
     {
-        std::cout << "File state of templates location has changed, updating template choices" << std::endl;
+        LogMessage("File state of templates location has changed, updating template choices");
         m_tmap_userTemplates = currentFileState;
         UpdateTemplateChoices();
     }
@@ -460,8 +450,7 @@ void FlipMain::SetupMenuIcons(wxMenu *menu)
     wxDir iconDir(iconFolderPath);
     if (!iconDir.IsOpened())
     {
-        std::cout << "Can't access icon images directory: " << iconFolderPath << std::endl;
-        m_programLog->LogMessage(wxString::Format("Failed to open directory: %s", iconFolderPath));
+        LogMessage("Failed to open directory: " + iconFolderPath);
         return;
     }
 
@@ -510,7 +499,7 @@ void FlipMain::SetupMenuIcons(wxMenu *menu)
 
 void FlipMain::UpdateTemplateChoices()
 {
-    std::cout << "Updating wxChoice widgets with new template data.\n\tFlipMain::m_useTemplate wxChoice widget updated" << std::endl;
+    LogMessage("Updating wxChoice widgets with new template data.\n\tFlipMain::m_useTemplate wxChoice widget updated");
     // Clear the FlipMain::wxChoice widget
     m_useTemplate->Clear();
 
@@ -530,7 +519,6 @@ void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, Rege
     wxTextFile file(templateFilePath);
     if (!file.Open())
     {
-        std::cout << "Unable to open template file: " << templateFilePath << std::endl;
         LogMessage("Core: Unable to open template file: " + templateFilePath);
         return;
     }
@@ -551,12 +539,10 @@ void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, Rege
 
                 // Add the pair to the list
                 regexList.push_back(std::make_pair(regexString, substitutionString));
-                std::cout << "Valid regex in template file: " << line << std::endl;
                 LogMessage("Valid regex in template file: " + line);
             }
             else
             {
-                std::cout << "Invalid regex in template file: " << line << std::endl;
                 LogMessage("Invalid regex in template file: " + line);
             }
         }

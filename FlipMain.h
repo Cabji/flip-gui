@@ -76,6 +76,7 @@ private:
 	// private members
 	bool m_useConsoleOutput = false;
 	wxArrayString m_configTemplateDirs;
+	wxString m_tempOutput;
 	wxTimer m_filePollTimer;
 };
 

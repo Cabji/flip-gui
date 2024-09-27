@@ -31,6 +31,6 @@ void FlipProgramLog::LogMessage(const wxString &message, FlipProgramLog &targetW
 
 void FlipProgramLog::OnClose(wxCloseEvent &event)
 {
-    std::cout << "Hiding Program Log window" << std::endl;
+    LogMessage("Hiding Program Log window");
     Hide(); // Hide the frame instead of closing it
 }

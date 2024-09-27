@@ -43,7 +43,6 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	if (target.IsEmpty())
 	{
 		// We didn't get anything from the file picker control
-		std::cout << "TE::OnBtnAdd: target value was empty" << std::endl;
 		m_mainFrame->LogMessage("TE::OnBtnAdd: target value was empty");
 		return;
 	}
@@ -58,11 +57,9 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	{
 		if (!wxFileName::Mkdir(path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
 		{
-			std::cout << "TE::OnBtnAdd: Could not create directory for new template file: " << target << std::endl;
 			m_mainFrame->LogMessage("TE::OnBtnAdd: Could not create directory for new template file: " + target);
 			return;
 		}
-		std::cout << "TE::OnBtnAdd: Created directory: " << path << " for new template creation." << std::endl;
 		m_mainFrame->LogMessage("TE::OnBtnAdd: Created directory: " + path + " for new template creation.");
 	}
 
@@ -70,12 +67,10 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	wxFileOutputStream wxfs_Target(target);
 	if (!wxfs_Target.IsOk())
 	{
-		std::cout << "TE::OnBtnAdd: Creation of new template file failed" << std::endl;
 		m_mainFrame->LogMessage("TE::OnBtnAdd: Creation of new template file failed");
 		return;
 	}
 
-	std::cout << "Template Editor created a new file at: " << target << std::endl;
 	m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
 
 	// Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
@@ -94,7 +89,7 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 	choiceEvent.SetInt(newIndex);
 	OnTemplateChoiceChanged(choiceEvent);
 
-	std::cout << "New template added, and editor updated." << std::endl;
+	m_mainFrame->LogMessage("New template added, and editor updated.");
 	m_templateEditorStatusBar->SetStatusText("New template created at " + target);
 }
 
@@ -144,13 +139,13 @@ void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnClose(wxCloseEvent &event)
 {
-	std::cout << "Hiding Template Editor window" << std::endl;
+	m_mainFrame->LogMessage("Hiding Template Editor window");
 	Hide(); // Hide the frame instead of closing it
 }
 
 void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 {
-	std::cout << "Template Choice in Template Editor changed" << std::endl;
+	m_mainFrame->LogMessage("Template Choice in Template Editor changed");
 	// get the selectionIndex of the wxChoice widget
 	int selectionIndex = m_templatesExisting->GetSelection();
 	if (selectionIndex == wxNOT_FOUND)
@@ -165,8 +160,7 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 	// Look up the corresponding file path in the m_tmap_userTemplates map
 	// dev-note: m_teCurrentTemplate is the absolute path and filename to the currently selected template file in Template Editor
 	m_teCurrentTemplate = m_mainFrame->m_tmap_userTemplates[selectedTemplateRelativeFilename];
-	std::cout << "Selected template path: " << m_teCurrentTemplate << '\n'
-			  << "Selected template name: " << selectedTemplateRelativeFilename << std::endl;
+	m_mainFrame->LogMessage("Selected template path: " + m_teCurrentTemplate + '\n' + "Selected template name: " + selectedTemplateRelativeFilename);
 
 	// // Check if template file exists
 	if (!wxFile::Exists(m_teCurrentTemplate))
@@ -198,9 +192,8 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 		templateContents.RemoveLast();
 	}
 
-	std::cout << "Well it seems like the template file was read into wxString templateContents" << std::endl;
-	std::cout << "templateContents:\n\n"
-			  << templateContents << std::endl;
+	m_mainFrame->LogMessage("Well it seems like the template file was read into wxString templateContents");
+	m_mainFrame->LogMessage("templateContents:\n\n" + templateContents);
 	// Set the loaded content into m_templateEditor
 	m_templateEditor->SetValue(templateContents);
 	m_templateFileWasLoaded = true;
@@ -246,7 +239,6 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 			{
 				// If the line doesn't match the "regex => replacement" format
 				wxString errorMessage = wxString::Format("Invalid line: '%s'", line);
-				std::cout << errorMessage << std::endl;
 				m_mainFrame->LogMessage(errorMessage);
 
 				// Set the status bar text to indicate invalid regex
@@ -261,7 +253,7 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 			wxString rightSide = regexValidator.GetMatch(line, 2);
 
 			// Further processing with leftSide and rightSide can be done here
-			std::cout << "Valid regex: " << leftSide << "=> " << rightSide << std::endl;
+			m_mainFrame->LogMessage("Valid regex: " + leftSide + "=> " + rightSide);
 		}
 
 		if (isValid)
@@ -273,13 +265,11 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 			wxFileOutputStream fileStream(m_teCurrentTemplate);
 			if (!fileStream.IsOk())
 			{
-				std::cout << "Failed to open template file " << m_teCurrentTemplate << " for writing." << std::endl;
 				m_mainFrame->LogMessage("Failed to open template file " + m_teCurrentTemplate + " for writing.");
 				return;
 			}
 			wxTextOutputStream textStream(fileStream);
 			textStream.WriteString(content);
-			std::cout << "Wrote template editor content to file on disk." << std::endl;
 			m_mainFrame->LogMessage("Wrote template editor content to file on disk.");
 			statusMessage << " | Template content saved to disk";
 		}
@@ -311,7 +301,7 @@ void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
 {
-	std::cout << "\tFlipTemplateEditor::m_templatesExisting wxChoices widget updated" << std::endl;
+	m_mainFrame->LogMessage("\tFlipTemplateEditor::m_templatesExisting wxChoices widget updated");
 	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
 	m_templatesExisting->Clear();
 	for (size_t i = 0; i < m_wxChoicePtr_Templates->GetCount(); ++i)

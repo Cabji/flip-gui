@@ -493,7 +493,7 @@
                     <property name="style"></property>
                     <property name="subclass">; ; forward_declare</property>
                     <property name="toolbar_pane">0</property>
-                    <property name="tooltip">Page Processing&#x0A;&#x0A;You can define which pages in the PDF file will be processed.&#x0A;&#x0A;Examples: &#x0A;1,2,3 will process only pages 1, 2 and 3&#x0A;2,4,6-10 will process pages 2, 4, 6, 7, 8, 9 and 10&#x0A;15-9 will process pages 9, 10, 11, 12, 13, 14 and 15&#x0A;&#x0A;Whitespaces are ignored. </property>
+                    <property name="tooltip">Page Processing&#x0A;&#x0A;You can define which pages in the PDF file will be processed.&#x0A;&#x0A;Examples: &#x0A;1,2,3 will process only pages 1, 2 and 3&#x0A;2,4,6-10 will process pages 2, 4, 6, 7, 8, 9 and 10&#x0A;15-9 will process pages 9, 10, 11, 12, 13, 14 and 15&#x0A;&#x0A;Whitespaces are ignored. &#x0A;Please note: This program uses page 0 as the first page in the PDF file.</property>
                     <property name="validator_data_type"></property>
                     <property name="validator_style">wxFILTER_NONE</property>
                     <property name="validator_type">wxDefaultValidator</property>

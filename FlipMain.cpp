@@ -313,17 +313,19 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
     // LogMessage("Reading text data from PDF file...");
     // iterate the pages and extract text data into vec_PDFPageStrings
+    m_tempOutput = "Processing page number: ";
     for (auto i = 0; i < numPages; ++i)
     {
         // per-page processing: to be added
         if ((processPages.find(i) != processPages.end()) || (pageRangeString.empty()))
         {
-            LogMessage("Processing page number: " + wxString::Format(wxT("%i"), i));
+            // append page number to output string
+            m_tempOutput << i << ", ";
 
             poppler::page *inPDFPage = inPDF->create_page(i);
             if (!inPDFPage)
             {
-                LogMessage("Could not create poppler::page object, index: " + wxString::Format(wxT("%i"), i));
+                LogMessage("Problem: Could not create poppler::page object, index: " + wxString::Format(wxT("%i"), i));
                 continue;
             }
 
@@ -346,12 +348,15 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
             vec_PDFPages.push_back(pageText);
             delete inPDFPage;
-            int pagesProcessed = vec_PDFPages.size();
-
-            // temporary output message:
-            LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
         }
     }
+    m_tempOutput.RemoveLast(2);
+    LogMessage(m_tempOutput);
+    m_tempOutput = wxEmptyString;
+
+    int pagesProcessed = vec_PDFPages.size();
+    // temporary output message:
+    LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

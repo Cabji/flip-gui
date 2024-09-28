@@ -303,7 +303,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
     if (!inPDF)
     {
-        m_tempOutput << "Error: could not open input file '" << inputFilePath << "'";
+        LogMessage("Error: could not open input file '" + inputFilePath + "'");
         return;
     }
 
@@ -316,14 +316,14 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     for (auto i = 0; i < numPages; ++i)
     {
         // per-page processing: to be added
-        if (processPages.find(i) != processPages.end())
+        if ((processPages.find(i) != processPages.end()) || (pageRangeString.empty()))
         {
-            LogMessage("Processing page " + i);
+            LogMessage("Processing page number: " + wxString::Format(wxT("%i"), i));
 
             poppler::page *inPDFPage = inPDF->create_page(i);
             if (!inPDFPage)
             {
-                LogMessage("Could not create poppler::page object, index: " + i);
+                LogMessage("Could not create poppler::page object, index: " + wxString::Format(wxT("%i"), i));
                 continue;
             }
 
@@ -348,8 +348,8 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
             delete inPDFPage;
             int pagesProcessed = vec_PDFPages.size();
 
-            // // temporary output message:
-            // LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
+            // temporary output message:
+            LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
         }
     }
 }

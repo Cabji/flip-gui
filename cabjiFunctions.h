@@ -39,6 +39,12 @@ void fnStrNormalizeNewLineChars(std::string &s);
 std::vector<std::string> fnStrSplitToVector(const std::string &s, const std::string &delimiter);
 
 /**
+ * @brief Strips excessive whitespace (including tabs, newlines) from a string
+ * @param input std::string - String to normalize
+ */
+std::string fnStrStripExcessiveWhitespace(const std::string &input);
+
+/**
  * @brief Trim excessive whitespace from start and end of std::string
  * @param str std::string - String to convert
  * @return std::string

@@ -125,6 +125,47 @@ std::vector<std::string> fnStrSplitToVector(const std::string &s, const std::str
 	return tokens;
 }
 
+std::string fnStrStripExcessiveWhitespace(const std::string &input)
+{
+	std::stringstream result;
+	std::string::const_iterator it = input.begin();
+	bool inWhitespace = false;
+
+	// Skip leading whitespace
+	while (it != input.end() && std::isspace(*it))
+	{
+		++it;
+	}
+
+	while (it != input.end())
+	{
+		if (std::isspace(*it))
+		{
+			if (!inWhitespace)
+			{
+				result << ' ';
+				inWhitespace = true;
+			}
+		}
+		else
+		{
+			result << *it;
+			inWhitespace = false;
+		}
+		++it;
+	}
+
+	std::string output = result.str();
+
+	// Remove trailing whitespace
+	if (!output.empty() && std::isspace(output.back()))
+	{
+		output.pop_back();
+	}
+
+	return output;
+}
+
 // Function to trim whitespace from both ends of a string
 std::string fnTrim(const std::string &str)
 {

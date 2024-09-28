@@ -87,6 +87,43 @@ FlipMain::~FlipMain()
     Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
 }
 
+void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
+{
+    wxTextFile file(templateFilePath);
+    if (!file.Open())
+    {
+        LogMessage("Core: Unable to open template file: " + templateFilePath);
+        return;
+    }
+
+    wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
+    wxRegEx regexValidator(regexPattern);
+
+    for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine())
+    {
+        line = line.Trim(true).Trim(false); // Trim whitespace
+
+        if (!fnIgnoreLine(line.ToStdString()))
+        {
+            if (regexValidator.Matches(line))
+            {
+                wxString regexString = regexValidator.GetMatch(line, 1);
+                wxString substitutionString = regexValidator.GetMatch(line, 2);
+
+                // Add the pair to the list
+                regexList.push_back(std::make_pair(regexString, substitutionString));
+                LogMessage("Valid regex in template file: " + line);
+            }
+            else
+            {
+                LogMessage("Invalid regex in template file: " + line);
+            }
+        }
+    }
+
+    file.Close();
+}
+
 void FlipMain::LogAllChildWidgets()
 {
     // Get the main frame's top-level window
@@ -243,14 +280,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
         LogMessage(outStr);
     }
 
-    // m_tempOutput << "Only process pages: ";
-    // for (const int page : processPages)
-    // {
-    //     m_tempOutput << page << " ";
-    // }
-    // LogMessage(m_tempOutput);
-
-    // If any validation failed, return early
+    // If any validation failed, output details on dialog and return early
     if (!success)
     {
         wxMessageBox("Required values missing. Please check the following and try again: \n\n" + m_tempOutput, "Required information missing", wxOK | wxICON_WARNING);
@@ -260,72 +290,68 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 
     // At this point, all validations passed, and we can proceed with core processing
     wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
+    // reset m_temOutput as we dont need to show any messages to the user for this current undertaking
+    m_tempOutput = wxEmptyString;
 
-    // *************** Start Core Program Functionality ***************
+    // *************** Start Core Functionality - Read and Parse PDF Data ***************
     RegexSubstitutionList regexList;
+
     // get regexes from template
     LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
-    // open input PDF file
-    // poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
-    // if (!inPDF)
-    // {
-    //     LogMessage("Error: could not open input file '" + inputFilePath + "'");
-    //     return;
-    // }
 
-    // // get text data from PDF file
-    // std::vector<std::string> vec_PDFPages;
-    // auto numPages = inPDF->pages();
+    // open input PDF file
+    poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
+    if (!inPDF)
+    {
+        m_tempOutput << "Error: could not open input file '" << inputFilePath << "'";
+        return;
+    }
+
+    // get text data from PDF file
+    std::vector<std::string> vec_PDFPages;
+    auto numPages = inPDF->pages();
 
     // LogMessage("Reading text data from PDF file...");
-    // // iterate the pages and extract text data into vec_PDFPageStrings
-    // for (auto i = 0; i < numPages; ++i)
-    // {
-    //     // per-page processing: to be added
-    //     // if (processPages.find(i) != processPages.end())
-    //     // {
-    //     // cout << "Processing page " << i << endl;
-    //     // Process this page
+    // iterate the pages and extract text data into vec_PDFPageStrings
+    for (auto i = 0; i < numPages; ++i)
+    {
+        // per-page processing: to be added
+        if (processPages.find(i) != processPages.end())
+        {
+            LogMessage("Processing page " + i);
 
-    //     poppler::page *inPDFPage = inPDF->create_page(i);
-    //     if (!inPDFPage)
-    //     {
-    //         LogMessage("Could not create poppler::page object, index: " + i);
-    //         continue;
-    //     }
+            poppler::page *inPDFPage = inPDF->create_page(i);
+            if (!inPDFPage)
+            {
+                LogMessage("Could not create poppler::page object, index: " + i);
+                continue;
+            }
 
-    //     // Extract text and ensure it's not null
-    //     auto textData = inPDFPage->text().to_utf8();
-    //     std::string pageText(textData.data(), textData.size());
+            // Extract text and ensure it's not null
+            auto textData = inPDFPage->text().to_utf8();
+            std::string pageText(textData.data(), textData.size());
 
-    //     fnStrNormalizeNewLineChars(pageText);
-    //     // strip whitespace: to be added
-    //     // if (stripWhitespace)
-    //     // {
-    //     //     pageText = fnStrStripExcessiveWhitespace(pageText);
-    //     // }
+            fnStrNormalizeNewLineChars(pageText);
 
-    //     // Show Data Before Proessing -dbp: to be added
-    //     // if (bShowDataBeforeProcessing)
-    //     // {
-    //     //     cout << "Data Before Processing - Page " << i << endl;
-    //     //     cout << pageText << endl;
-    //     // }
+            // switch: -sws (strip excesive whitespace)
+            if (m_switchSWS->GetValue())
+            {
+                pageText = fnStrStripExcessiveWhitespace(pageText);
+            }
+            // switch: -dbp (show data before processing)
+            if (m_switchDBP->GetValue())
+            {
+                LogMessage("Data Before Processing - Page " + wxString::Format(wxT("%i"), i) + "\n" + pageText);
+            }
 
-    //     vec_PDFPages.push_back(pageText);
-    //     delete inPDFPage;
+            vec_PDFPages.push_back(pageText);
+            delete inPDFPage;
+            int pagesProcessed = vec_PDFPages.size();
 
-    //     // }
-    //     // else
-    //     // {
-    //     //     cout << "Skipping page " << i << endl;
-    //     //     // Do not process this page
-    //     // }
-    // }
-    // int pagesProcessed = vec_PDFPages.size();
-
-    // // temporary output message:
-    // LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
+            // // temporary output message:
+            // LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
+        }
+    }
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)
@@ -531,41 +557,4 @@ void FlipMain::UpdateTemplateChoices()
     // update the Template Editor wxChoice widget by triggering FlipTemplateEditor::OnTemplateListUpdated with a wxCommandEvent
     wxCommandEvent event;
     m_templateEditor->OnTemplateListUpdated(event);
-}
-
-void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
-{
-    wxTextFile file(templateFilePath);
-    if (!file.Open())
-    {
-        LogMessage("Core: Unable to open template file: " + templateFilePath);
-        return;
-    }
-
-    wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
-    wxRegEx regexValidator(regexPattern);
-
-    for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine())
-    {
-        line = line.Trim(true).Trim(false); // Trim whitespace
-
-        if (!fnIgnoreLine(line.ToStdString()))
-        {
-            if (regexValidator.Matches(line))
-            {
-                wxString regexString = regexValidator.GetMatch(line, 1);
-                wxString substitutionString = regexValidator.GetMatch(line, 2);
-
-                // Add the pair to the list
-                regexList.push_back(std::make_pair(regexString, substitutionString));
-                LogMessage("Valid regex in template file: " + line);
-            }
-            else
-            {
-                LogMessage("Invalid regex in template file: " + line);
-            }
-        }
-    }
-
-    file.Close();
 }

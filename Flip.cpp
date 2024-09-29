@@ -220,3 +220,48 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 TemplateEditor::~TemplateEditor()
 {
 }
+
+DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+
+	wxGridBagSizer* m_dataviewerSizer;
+	m_dataviewerSizer = new wxGridBagSizer( 0, 0 );
+	m_dataviewerSizer->SetFlexibleDirection( wxBOTH );
+	m_dataviewerSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_lblDataBefore = new wxStaticText( this, wxID_ANY, _("Before Processing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_lblDataBefore->Wrap( -1 );
+	m_dataviewerSizer->Add( m_lblDataBefore, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER|wxALL, 5 );
+
+	m_lblDataAfter = new wxStaticText( this, wxID_ANY, _("After Processing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_lblDataAfter->Wrap( -1 );
+	m_dataviewerSizer->Add( m_lblDataAfter, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER|wxALL, 5 );
+
+	m_dataBefore = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataviewerSizer->Add( m_dataBefore, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+	m_dataAfter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataviewerSizer->Add( m_dataAfter, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+	m_spinBefore = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_HORIZONTAL );
+	m_dataviewerSizer->Add( m_spinBefore, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+	m_spinAfter = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_HORIZONTAL );
+	m_dataviewerSizer->Add( m_spinAfter, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+
+	m_dataviewerSizer->AddGrowableCol( 0 );
+	m_dataviewerSizer->AddGrowableCol( 1 );
+	m_dataviewerSizer->AddGrowableRow( 1 );
+
+	this->SetSizer( m_dataviewerSizer );
+	this->Layout();
+
+	this->Centre( wxBOTH );
+}
+
+DataViewer::~DataViewer()
+{
+}

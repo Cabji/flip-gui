@@ -30,6 +30,7 @@
 #include <wx/menu.h>
 #include <wx/statusbr.h>
 #include <wx/frame.h>
+#include <wx/spinbutt.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -115,6 +116,29 @@ class TemplateEditor : public wxFrame
 		TemplateEditor( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Template Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 456,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~TemplateEditor();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DataViewer
+///////////////////////////////////////////////////////////////////////////////
+class DataViewer : public wxFrame
+{
+	private:
+
+	protected:
+		wxStaticText* m_lblDataBefore;
+		wxStaticText* m_lblDataAfter;
+		wxTextCtrl* m_dataBefore;
+		wxTextCtrl* m_dataAfter;
+		wxSpinButton* m_spinBefore;
+		wxSpinButton* m_spinAfter;
+
+	public:
+
+		DataViewer( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Flip :: Data Viewer"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+
+		~DataViewer();
 
 };
 

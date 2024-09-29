@@ -36,6 +36,7 @@ public:
 	// cutom constructor declared below here
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
+	wxString GetPDFPageText(const int pageNum);
 	void LogMessage(wxString message);
 	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();
@@ -75,6 +76,7 @@ private:
 
 	// private members
 	bool m_useConsoleOutput = false;
+	std::vector<std::string> m_vec_pdfData;
 	wxArrayString m_configTemplateDirs;
 	wxString m_tempOutput;
 	wxTimer m_filePollTimer;

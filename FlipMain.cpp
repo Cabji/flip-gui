@@ -87,6 +87,14 @@ FlipMain::~FlipMain()
     Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
 }
 
+wxString FlipMain::GetPDFPageText(const int pageNum)
+{
+    if (pageNum >= 0 && pageNum < m_vec_pdfData.size())
+    {
+        return m_vec_pdfData[pageNum];
+    }
+    return wxEmptyString;
+}
 void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
 {
     wxTextFile file(templateFilePath);
@@ -308,7 +316,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     }
 
     // get text data from PDF file
-    std::vector<std::string> vec_PDFPages;
+    // use private member std::vector<std::string> m_vec_pdfData to store the PDF page text data
     auto numPages = inPDF->pages();
 
     // LogMessage("Reading text data from PDF file...");
@@ -346,7 +354,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
                 LogMessage("Data Before Processing - Page " + wxString::Format(wxT("%i"), i) + "\n" + pageText);
             }
 
-            vec_PDFPages.push_back(pageText);
+            m_vec_pdfData.push_back(pageText);
             delete inPDFPage;
         }
     }
@@ -354,7 +362,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     LogMessage(m_tempOutput);
     m_tempOutput = wxEmptyString;
 
-    int pagesProcessed = vec_PDFPages.size();
+    int pagesProcessed = m_vec_pdfData.size();
     // temporary output message:
     LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 }

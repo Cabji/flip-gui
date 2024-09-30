@@ -1,4 +1,5 @@
 #include "FlipMain.h"
+#include "FlipDataViewer.h"
 #include "FlipProgramLog.h"
 #include "FlipTemplateEditor.h"
 #include <poppler/cpp/poppler-document.h>
@@ -45,6 +46,8 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     m_programLog->LogMessage("Program started.");
     // create a FlipTemplateEditor <wxFrame> object which is a child of this (FlipMain <wxFrame>)
     m_templateEditor = std::make_unique<FlipTemplateEditor>(this);
+    // create a FlipDataViewer <wxFrame> object which is a child of this (FlipMain <wxFrame>)
+    m_dataViewer = std::make_unique<FlipDataViewer>(this);
 
     this->SetSizerAndFit(this->m_mainFrameSizer);
     this->SetupMenuIcons(this->m_menuFile);
@@ -365,6 +368,8 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     int pagesProcessed = m_vec_pdfData.size();
     // temporary output message:
     LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
+
+    m_dataViewer->Show();
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

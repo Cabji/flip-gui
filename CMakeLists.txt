@@ -21,6 +21,7 @@ include(${wxWidgets_USE_FILE})
 add_executable(FlipApp 
     MyApp.cpp 
     Flip.cpp 
+    FlipDataViewer.cpp
     FlipMain.cpp 
     FlipProgramLog.cpp
     FlipTemplateEditor.cpp

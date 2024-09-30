@@ -5,10 +5,9 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 {
 	m_mainFrame = parent;
 	// set unordered map to make relation between spinButton widgets and textCtrl widgets (before & after)
-	m_uomap_SpinToTextCtrl[m_spinBefore] = m_dataBefore;
-	m_uomap_SpinToTextCtrl[m_spinAfter] = m_dataAfter;
+	m_spinPages->SetValue(0);
 	// event binds
-	m_spinBefore->Bind(wxEVT_SPIN_UP, &FlipDataViewer::OnSpinUp, this);
+	Bind(wxEVT_SPIN_UP, &FlipDataViewer::OnSpinUp, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
 }
 
@@ -19,7 +18,14 @@ void FlipDataViewer::OnClose(wxEvent &event)
 
 void FlipDataViewer::OnSpinUp(wxEvent &event)
 {
-	wxSpinButton *cause = dynamic_cast<wxSpinButton *>(event.GetEventObject());
-	m_mainFrame->LogMessage("Spin Up Event occurred. Value: " + wxString::Format("%i", cause->GetValue()));
-	m_uomap_SpinToTextCtrl[cause]->SetValue("This is a test");
+	// set current page number in m_lblSpinPages
+	m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue()));
+	// get before processing page data and display in before textctrl
+	m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+
+	// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
+	m_dataAfter->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+
+	// log info
+	m_mainFrame->LogMessage("Spin Up Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
 }

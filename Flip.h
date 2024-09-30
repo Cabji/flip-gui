@@ -131,8 +131,8 @@ class DataViewer : public wxFrame
 		wxStaticText* m_lblDataAfter;
 		wxTextCtrl* m_dataBefore;
 		wxTextCtrl* m_dataAfter;
-		wxSpinButton* m_spinBefore;
-		wxSpinButton* m_spinAfter;
+		wxSpinButton* m_spinPages;
+		wxStaticText* m_lblSpinPages;
 
 	public:
 

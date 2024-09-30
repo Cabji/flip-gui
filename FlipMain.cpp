@@ -98,6 +98,7 @@ wxString FlipMain::GetPDFPageText(const int pageNum)
     }
     return wxEmptyString;
 }
+
 void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
 {
     wxTextFile file(templateFilePath);
@@ -215,6 +216,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     std::set<int> processPages;
     wxString templateFileAbsolutePath;
     int problemCount = 1;
+    m_vec_pdfData.clear();
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();

@@ -229,7 +229,7 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxGridBagSizer* m_dataviewerSizer;
 	m_dataviewerSizer = new wxGridBagSizer( 0, 0 );
 	m_dataviewerSizer->SetFlexibleDirection( wxBOTH );
-	m_dataviewerSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	m_dataviewerSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 
 	m_lblDataBefore = new wxStaticText( this, wxID_ANY, _("Before Processing"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_lblDataBefore->Wrap( -1 );
@@ -239,22 +239,24 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_lblDataAfter->Wrap( -1 );
 	m_dataviewerSizer->Add( m_lblDataAfter, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER|wxALL, 5 );
 
-	m_dataBefore = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_dataviewerSizer->Add( m_dataBefore, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	m_dataBefore = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_WORDWRAP );
+	m_dataviewerSizer->Add( m_dataBefore, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
-	m_dataAfter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_dataviewerSizer->Add( m_dataAfter, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	m_dataAfter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_WORDWRAP );
+	m_dataviewerSizer->Add( m_dataAfter, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
-	m_spinBefore = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_HORIZONTAL );
-	m_dataviewerSizer->Add( m_spinBefore, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	m_spinPages = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxSP_HORIZONTAL );
+	m_dataviewerSizer->Add( m_spinPages, wxGBPosition( 3, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
-	m_spinAfter = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_HORIZONTAL );
-	m_dataviewerSizer->Add( m_spinAfter, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	m_lblSpinPages = new wxStaticText( this, wxID_ANY, _("<b>Page 0</b>"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_lblSpinPages->SetLabelMarkup( _("<b>Page 0</b>") );
+	m_lblSpinPages->Wrap( -1 );
+	m_dataviewerSizer->Add( m_lblSpinPages, wxGBPosition( 1, 0 ), wxGBSpan( 1, 2 ), wxALIGN_CENTER|wxALL|wxEXPAND, 0 );
 
 
 	m_dataviewerSizer->AddGrowableCol( 0 );
 	m_dataviewerSizer->AddGrowableCol( 1 );
-	m_dataviewerSizer->AddGrowableRow( 1 );
+	m_dataviewerSizer->AddGrowableRow( 2 );
 
 	this->SetSizer( m_dataviewerSizer );
 	this->Layout();

@@ -20,8 +20,10 @@ public:
 	//// end generated class members
 
 private:
+	void OnClose(wxEvent &event);
 	void OnSpinUp(wxEvent &event);
 	FlipMain *m_mainFrame;
+	std::unordered_map<wxSpinButton *, wxTextCtrl *> m_uomap_SpinToTextCtrl;
 };
 
 #endif // __FlipDataViewer__

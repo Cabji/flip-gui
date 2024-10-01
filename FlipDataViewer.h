@@ -21,6 +21,7 @@ public:
 
 private:
 	void OnClose(wxEvent &event);
+	void OnFlipMainLaunchClicked(wxEvent &event);
 	void OnSpinUp(wxEvent &event);
 	FlipMain *m_mainFrame;
 	std::unordered_map<wxSpinButton *, wxTextCtrl *> m_uomap_SpinToTextCtrl;

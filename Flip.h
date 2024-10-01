@@ -129,10 +129,11 @@ class DataViewer : public wxFrame
 	protected:
 		wxStaticText* m_lblDataBefore;
 		wxStaticText* m_lblDataAfter;
+		wxStaticText* m_lblSpinPages;
 		wxTextCtrl* m_dataBefore;
 		wxTextCtrl* m_dataAfter;
 		wxSpinButton* m_spinPages;
-		wxStaticText* m_lblSpinPages;
+		wxButton* m_btnContinueProcessing;
 
 	public:
 

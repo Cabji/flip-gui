@@ -239,19 +239,22 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_lblDataAfter->Wrap( -1 );
 	m_dataviewerSizer->Add( m_lblDataAfter, wxGBPosition( 0, 1 ), wxGBSpan( 1, 1 ), wxALIGN_CENTER|wxALL, 5 );
 
-	m_dataBefore = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_WORDWRAP );
+	m_lblSpinPages = new wxStaticText( this, wxID_ANY, _("<b>Page 0</b>"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_lblSpinPages->SetLabelMarkup( _("<b>Page 0</b>") );
+	m_lblSpinPages->Wrap( -1 );
+	m_dataviewerSizer->Add( m_lblSpinPages, wxGBPosition( 1, 0 ), wxGBSpan( 1, 2 ), wxALIGN_CENTER|wxALL|wxEXPAND, 0 );
+
+	m_dataBefore = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
 	m_dataviewerSizer->Add( m_dataBefore, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
-	m_dataAfter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_WORDWRAP );
+	m_dataAfter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_BESTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP );
 	m_dataviewerSizer->Add( m_dataAfter, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
 	m_spinPages = new wxSpinButton( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxSP_HORIZONTAL );
 	m_dataviewerSizer->Add( m_spinPages, wxGBPosition( 3, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
-	m_lblSpinPages = new wxStaticText( this, wxID_ANY, _("<b>Page 0</b>"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_lblSpinPages->SetLabelMarkup( _("<b>Page 0</b>") );
-	m_lblSpinPages->Wrap( -1 );
-	m_dataviewerSizer->Add( m_lblSpinPages, wxGBPosition( 1, 0 ), wxGBSpan( 1, 2 ), wxALIGN_CENTER|wxALL|wxEXPAND, 0 );
+	m_btnContinueProcessing = new wxButton( this, wxID_ANY, _("Continue processing ↻"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataviewerSizer->Add( m_btnContinueProcessing, wxGBPosition( 4, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
 
 	m_dataviewerSizer->AddGrowableCol( 0 );

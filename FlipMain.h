@@ -24,6 +24,7 @@ class FlipDataViewer;
 // declare custom types/events
 WX_DECLARE_STRING_HASH_MAP(wxString, TemplateMap);
 wxDECLARE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
+wxDECLARE_EVENT(EVT_FLIPMAIN_LAUNCH_CLICKED, wxCommandEvent);
 // type to hold regex and substitution string pairs
 typedef wxVector<std::pair<wxString, wxString>> RegexSubstitutionList;
 
@@ -38,6 +39,8 @@ public:
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
 	wxString GetPDFPageText(const int pageNum);
+	int GetPDFPageTotal();
+	bool GetSwitchValue(const wxString &switchName);
 	void LogMessage(wxString message);
 	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();

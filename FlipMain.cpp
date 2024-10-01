@@ -22,6 +22,7 @@
 // type to hold regex and substitution string pairs
 typedef wxVector<std::pair<wxString, wxString>> RegexSubstitutionList;
 wxDEFINE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_FLIPMAIN_LAUNCH_CLICKED, wxCommandEvent);
 
 // dev-note: if you add resource const values, ensure they prepend with leading / char
 const wxString FlipMain::RESOURCE_MENU_ICONS_PATH = wxT("/resources/images/menuIcons");
@@ -97,6 +98,27 @@ wxString FlipMain::GetPDFPageText(const int pageNum)
         return m_vec_pdfData[pageNum];
     }
     return wxEmptyString;
+}
+
+int FlipMain::GetPDFPageTotal()
+{
+    return m_vec_pdfData.size();
+}
+
+bool FlipMain::GetSwitchValue(const wxString &switchName)
+{
+    if (switchName.Lower() == "dbp")
+    {
+        return m_switchDBP->GetValue();
+    }
+    else if (switchName.Lower() == "sws")
+    {
+        return m_switchSWS->GetValue();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
@@ -302,7 +324,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     }
 
     // At this point, all validations passed, and we can proceed with core processing
-    wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
+    // wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
     // reset m_temOutput as we dont need to show any messages to the user for this current undertaking
     m_tempOutput = wxEmptyString;
 
@@ -371,6 +393,9 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // temporary output message:
     LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 
+    // trigger event so that FlipDataViewer object know the LAUNCH button was clicked
+    wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
+    wxPostEvent(m_dataViewer.get(), tripEvent);
     m_dataViewer->Show();
 }
 

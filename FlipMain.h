@@ -68,6 +68,7 @@ private:
 	// event handlers
 	void OnAbout(wxCommandEvent &event);
 	void OnBtnLaunch(wxCommandEvent &event);
+	void OnFlipDataViewerBtnContProcessing(wxCommandEvent &event);
 	void OnUseTemplateChoice(wxCommandEvent &event);
 	void OnQuit(wxCommandEvent &event);
 	void OnShowProgramLog(wxCommandEvent &event);

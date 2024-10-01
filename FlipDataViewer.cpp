@@ -1,20 +1,27 @@
 #include "FlipDataViewer.h"
 
+// define custom events
+wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED, wxCommandEvent);
+
 FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
 {
 	m_mainFrame = parent;
 	// set unordered map to make relation between spinButton widgets and textCtrl widgets (before & after)
 	m_spinPages->SetValue(0);
-	// set continue processing button to disabled if -dbp is not checked
-	if (!m_mainFrame->GetSwitchValue("dbp"))
-	{
-		m_btnContinueProcessing->Disable();
-	}
+	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("Continue processing ↻"));
 	// event binds
 	Bind(wxEVT_SPIN_UP, &FlipDataViewer::OnSpinUp, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
 	Bind(EVT_FLIPMAIN_LAUNCH_CLICKED, &FlipDataViewer::OnFlipMainLaunchClicked, this);
+	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
+}
+
+void FlipDataViewer::OnBtnContinueProcessing(wxEvent &event)
+{
+	// trip event to tell FlipMain that the continue processing button was clicked
+	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED);
+	wxPostEvent(m_mainFrame, tripEvent);
 }
 
 void FlipDataViewer::OnClose(wxEvent &event)
@@ -27,6 +34,15 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	// when FlipMain::OnBtnLaunch is clicked and its handler runs, it will trigger an event to be handled in here
 	// this is primarily so we can adjust the widgets in FlipDataViewer to suit what FlipMain is doing
 	m_mainFrame->LogMessage("we are handling a LAUNCH button click in FlipDataViewer!");
+	// check if m_btnContinueProcessing widget should be shown/hidden
+	if (m_mainFrame->GetSwitchValue("dbp"))
+	{
+		m_btnContinueProcessing->Show();
+	}
+	else
+	{
+		m_btnContinueProcessing->Hide();
+	}
 }
 
 void FlipDataViewer::OnSpinUp(wxEvent &event)

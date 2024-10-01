@@ -54,6 +54,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     this->SetupMenuIcons(this->m_menuFile);
 
     // event handler binds
+    Bind(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnContProcessing, this);
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
@@ -397,6 +398,23 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
     wxPostEvent(m_dataViewer.get(), tripEvent);
     m_dataViewer->Show();
+
+    // at this point we need to know if -dbp switch is true.
+    // if m_switchDBP->GetValue() == false means we can continue processing immediately
+    // otherwise, process continuation is handed over to FlipDataViewer and we wait for button click from there.
+
+    if (!m_switchDBP->GetValue())
+    {
+        OnFlipDataViewerBtnContProcessing(tripEvent);
+    }
+}
+
+void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
+{
+    // this method handles a button press from FlipDataViewer::m_btnContinueProcessing
+    // but we could call this method from FlipMain::OnBtnLaunch to continue processing automatically
+    // this method will end the PDF data processing (it will carry out the regex substitutions on m_vec_pdfData[x])
+    LogMessage("we would be continuing processing!");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

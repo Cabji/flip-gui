@@ -86,6 +86,7 @@ private:
 	wxArrayString m_configTemplateDirs;
 	wxString m_tempOutput;
 	wxTimer m_filePollTimer;
+	RegexSubstitutionList m_regexList;
 };
 
 #endif // __FlipMain__

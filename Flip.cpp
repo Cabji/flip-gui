@@ -120,6 +120,10 @@ Main::Main( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoin
 	m_menuFile_Quit = new wxMenuItem( m_menuFile, ID_MENU_FILE_QUIT, wxString( _("Quit") ) + wxT('\t') + wxT("Ctrl+Q"), _("Quit the program"), wxITEM_NORMAL );
 	m_menuFile->Append( m_menuFile_Quit );
 
+	wxMenuItem* m_menuFile_DataViewer;
+	m_menuFile_DataViewer = new wxMenuItem( m_menuFile, ID_MENU_FILE_DATAVIEWER, wxString( _("Data Viewer") ) + wxT('\t') + wxT("Ctrl+D"), _("Open the Data Viewer"), wxITEM_NORMAL );
+	m_menuFile->Append( m_menuFile_DataViewer );
+
 	m_menuBar->Append( m_menuFile, _("File") );
 
 	m_menuLog = new wxMenu();

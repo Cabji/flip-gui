@@ -131,7 +131,7 @@ void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, Rege
         return;
     }
 
-    wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
+    wxString regexPattern = "^\\s*(\\S.*?)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
     wxRegEx regexValidator(regexPattern);
 
     for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine())
@@ -330,10 +330,9 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     m_tempOutput = wxEmptyString;
 
     // *************** Start Core Functionality - Read and Parse PDF Data ***************
-    RegexSubstitutionList regexList;
 
-    // get regexes from template
-    LoadRegexSubstitutionPairs(templateFileAbsolutePath, regexList);
+    // get regexes from template - store in private member m_regexList
+    LoadRegexSubstitutionPairs(templateFileAbsolutePath, m_regexList);
 
     // open input PDF file
     poppler::document *inPDF = poppler::document::load_from_file(inputFilePath.ToStdString());
@@ -414,7 +413,16 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
     // this method handles a button press from FlipDataViewer::m_btnContinueProcessing
     // but we could call this method from FlipMain::OnBtnLaunch to continue processing automatically
     // this method will end the PDF data processing (it will carry out the regex substitutions on m_vec_pdfData[x])
-    LogMessage("we would be continuing processing!");
+    if (m_vec_pdfData.size() <= 0)
+    {
+        // quit because nothing to do
+        return;
+    }
+    // loop the m_vec_dfData entries and apply the regexes from template to the strings
+    for (std::pair<wxString, wxString> pair_regex : m_regexList)
+    {
+        LogMessage("|" + pair_regex.first + "| => |" + pair_regex.second + "|");
+    }
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

@@ -116,6 +116,11 @@ int FlipMain::GetPDFPageTotal()
     return m_vec_pdfData.size();
 }
 
+int FlipMain::GetProcessedPDFPageTotal()
+{
+    return m_vec_pdfDataProcessed.size();
+}
+
 bool FlipMain::GetSwitchValue(const wxString &switchName)
 {
     if (switchName.Lower() == "dbp")
@@ -249,8 +254,10 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     std::set<int> processPages;
     wxString templateFileAbsolutePath;
     int problemCount = 1;
+    // reset class member data involved in this process to prevent any data accumulation
     m_vec_pdfData.clear();
     m_vec_pdfDataProcessed.clear();
+    m_regexList.clear();
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
@@ -404,19 +411,22 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // temporary output message:
     LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 
-    // trigger event so that FlipDataViewer object know the LAUNCH button was clicked
-    wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
-    wxPostEvent(m_dataViewer.get(), tripEvent);
-    m_dataViewer->Show();
-
     // at this point we need to know if -dbp switch is true.
     // if m_switchDBP->GetValue() == false means we can continue processing immediately
     // otherwise, process continuation is handed over to FlipDataViewer and we wait for button click from there.
 
+    wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
     if (!m_switchDBP->GetValue())
     {
         OnFlipDataViewerBtnContProcessing(tripEvent);
     }
+    else
+    {
+        // trigger event so that FlipDataViewer object knows the LAUNCH button was clicked
+        wxPostEvent(m_dataViewer.get(), tripEvent);
+    }
+    // if FlipMain::LAUNCH was pressed, make the dataViewer frame show()
+    m_dataViewer->Show();
 }
 
 void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
@@ -465,8 +475,12 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
         }
 
         // Convert wxString back to std::string after processing
-        pdfDataEntry = wxPdfDataEntry.ToUTF8().data();
+        pdfDataEntry = std::string(wxPdfDataEntry.ToUTF8());
     }
+
+    // trip the wxEVT_SPIN event in m_dataViewer to make the widgets update
+    wxCommandEvent tripEvent(wxEVT_SPIN);
+    wxPostEvent(m_dataViewer.get(), tripEvent);
     LogMessage("regex processing completed.");
 }
 

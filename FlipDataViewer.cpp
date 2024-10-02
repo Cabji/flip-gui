@@ -47,22 +47,23 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	wxCommandEvent tripEvent = wxCommandEvent(wxEVT_NULL);
 	OnSpin(tripEvent);
 	m_dataviewerSizer->Layout();
-	this->Fit();
 }
 
 void FlipDataViewer::OnSpin(wxEvent &event)
 {
-	if (m_spinPages->GetValue() <= m_mainFrame->GetPDFPageTotal())
+	if (m_spinPages->GetValue() <= m_mainFrame->GetPDFPageTotal() - 1)
 	{
 		// set current page number in m_lblSpinPages
 		m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue() + 1) + " of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
 		// get before processing page data and display in before textctrl
 		m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
 
-		// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
-		m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(m_spinPages->GetValue()));
-
-		// log info
+		// ensure that the spin value is within the bounds of the processed PDF page data vector
+		if (m_spinPages->GetValue() <= m_mainFrame->GetProcessedPDFPageTotal() - 1)
+		{
+			// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
+			m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(m_spinPages->GetValue()));
+		}
 	}
 	else
 	{

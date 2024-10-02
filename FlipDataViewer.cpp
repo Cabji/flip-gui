@@ -60,7 +60,7 @@ void FlipDataViewer::OnSpin(wxEvent &event)
 		m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
 
 		// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
-		// m_dataAfter->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+		m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(m_spinPages->GetValue()));
 
 		// log info
 	}

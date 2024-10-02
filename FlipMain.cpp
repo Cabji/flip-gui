@@ -59,6 +59,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
     Bind(wxEVT_MENU, &FlipMain::OnShowTemplateEditor, this, ID_MENU_FILE_TEMPLATEEDITOR);
+    Bind(wxEVT_MENU, &FlipMain::OnShowDataViewer, this, ID_MENU_FILE_DATAVIEWER);
     Bind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
     // spcific widget binds
     m_btnLaunch->Bind(wxEVT_BUTTON, &FlipMain::OnBtnLaunch, this);
@@ -97,6 +98,15 @@ wxString FlipMain::GetPDFPageText(const int pageNum)
     if (pageNum >= 0 && pageNum < m_vec_pdfData.size())
     {
         return m_vec_pdfData[pageNum];
+    }
+    return wxEmptyString;
+}
+
+wxString FlipMain::GetProcessedPDFPageText(const int pageNum)
+{
+    if (pageNum >= 0 && pageNum < m_vec_pdfData.size())
+    {
+        return m_vec_pdfDataProcessed[pageNum];
     }
     return wxEmptyString;
 }
@@ -240,6 +250,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     wxString templateFileAbsolutePath;
     int problemCount = 1;
     m_vec_pdfData.clear();
+    m_vec_pdfDataProcessed.clear();
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
@@ -418,16 +429,64 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
         // quit because nothing to do
         return;
     }
-    // loop the m_vec_dfData entries and apply the regexes from template to the strings
-    for (std::pair<wxString, wxString> pair_regex : m_regexList)
+    // Copy m_vec_pdfData to m_vec_pdfDataProcessed
+    m_vec_pdfDataProcessed = m_vec_pdfData;
+
+    // Loop through each entry in m_vec_pdfDataProcessed
+    for (std::string &pdfDataEntry : m_vec_pdfDataProcessed)
     {
-        LogMessage("|" + pair_regex.first + "| => |" + pair_regex.second + "|");
+        // Convert std::string to wxString for processing
+        wxString wxPdfDataEntry = wxString::FromUTF8(pdfDataEntry);
+
+        // Loop through each regex and substitution pair
+        for (const std::pair<wxString, wxString> &pair_regex : m_regexList)
+        {
+            // Create the regex object for the current pair's first value (the regex pattern)
+            wxRegEx regex(pair_regex.first);
+
+            // Check if the regex is valid
+            if (regex.IsValid())
+            {
+                // Perform the substitution on the wxPdfDataEntry
+                // Replace will return true if a match was found and replaced
+                if (regex.Replace(&wxPdfDataEntry, pair_regex.second))
+                {
+                    LogMessage("Applied regex: |" + pair_regex.first + "| => |" + pair_regex.second + "| on PDF data.");
+                }
+                else
+                {
+                    LogMessage("No match found for regex: |" + pair_regex.first + "|");
+                }
+            }
+            else
+            {
+                LogMessage("Invalid regex: |" + pair_regex.first + "|");
+            }
+        }
+
+        // Convert wxString back to std::string after processing
+        pdfDataEntry = wxPdfDataEntry.ToUTF8().data();
     }
+    LogMessage("regex processing completed.");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)
 {
     Close(true);
+}
+
+void FlipMain::OnShowDataViewer(wxCommandEvent &event)
+{
+
+    if (m_dataViewer)
+    {
+        LogMessage("Showing Data Viewer window");
+        m_programLog->Show(true);
+    }
+    else
+    {
+        LogMessage("Data Viewer object m_dataViewer does not exist.");
+    }
 }
 
 void FlipMain::OnShowProgramLog(wxCommandEvent &event)
@@ -437,6 +496,10 @@ void FlipMain::OnShowProgramLog(wxCommandEvent &event)
         LogMessage("Showing Program Log window");
         m_programLog->Show(true);
     }
+    else
+    {
+        LogMessage("Program Log object m_programLog does not exist.");
+    }
 }
 
 void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
@@ -445,6 +508,10 @@ void FlipMain::OnShowTemplateEditor(wxCommandEvent &event)
     {
         LogMessage("Showing Template Editor window");
         m_templateEditor->Show(true);
+    }
+    else
+    {
+        LogMessage("Template Editor object m_templateEditor does not exist.");
     }
 }
 

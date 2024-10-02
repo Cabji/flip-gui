@@ -39,6 +39,7 @@ public:
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
 	wxString GetPDFPageText(const int pageNum);
+	wxString GetProcessedPDFPageText(const int pageNum);
 	int GetPDFPageTotal();
 	bool GetSwitchValue(const wxString &switchName);
 	void LogMessage(wxString message);
@@ -71,6 +72,7 @@ private:
 	void OnFlipDataViewerBtnContProcessing(wxCommandEvent &event);
 	void OnUseTemplateChoice(wxCommandEvent &event);
 	void OnQuit(wxCommandEvent &event);
+	void OnShowDataViewer(wxCommandEvent &event);
 	void OnShowProgramLog(wxCommandEvent &event);
 	void OnShowTemplateEditor(wxCommandEvent &event);
 	void OnSwitchDBPChecked(wxCommandEvent &event);
@@ -83,6 +85,7 @@ private:
 	// private members
 	bool m_useConsoleOutput = false;
 	std::vector<std::string> m_vec_pdfData;
+	std::vector<std::string> m_vec_pdfDataProcessed;
 	wxArrayString m_configTemplateDirs;
 	wxString m_tempOutput;
 	wxTimer m_filePollTimer;

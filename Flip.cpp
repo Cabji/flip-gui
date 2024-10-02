@@ -223,10 +223,9 @@ TemplateEditor::~TemplateEditor()
 
 DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( 600,300 ), wxDefaultSize );
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 
-	wxGridBagSizer* m_dataviewerSizer;
 	m_dataviewerSizer = new wxGridBagSizer( 0, 0 );
 	m_dataviewerSizer->SetFlexibleDirection( wxBOTH );
 	m_dataviewerSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );

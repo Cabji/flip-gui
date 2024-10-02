@@ -127,6 +127,7 @@ class DataViewer : public wxFrame
 	private:
 
 	protected:
+		wxGridBagSizer* m_dataviewerSizer;
 		wxStaticText* m_lblDataBefore;
 		wxStaticText* m_lblDataAfter;
 		wxStaticText* m_lblSpinPages;

@@ -1514,7 +1514,7 @@
       <property name="hidden">0</property>
       <property name="id">wxID_ANY</property>
       <property name="maximum_size"></property>
-      <property name="minimum_size"></property>
+      <property name="minimum_size">600,300</property>
       <property name="name">DataViewer</property>
       <property name="pos"></property>
       <property name="size">500,300</property>
@@ -1536,7 +1536,7 @@
         <property name="minimum_size"></property>
         <property name="name">m_dataviewerSizer</property>
         <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_ALL</property>
-        <property name="permission">none</property>
+        <property name="permission">protected</property>
         <property name="vgap">0</property>
         <object class="gbsizeritem" expanded="true">
           <property name="border">5</property>

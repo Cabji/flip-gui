@@ -11,7 +11,7 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	m_spinPages->SetValue(0);
 	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("Continue processing ↻"));
 	// event binds
-	Bind(wxEVT_SPIN_UP, &FlipDataViewer::OnSpinUp, this);
+	Bind(wxEVT_SPIN, &FlipDataViewer::OnSpin, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
 	Bind(EVT_FLIPMAIN_LAUNCH_CLICKED, &FlipDataViewer::OnFlipMainLaunchClicked, this);
 	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
@@ -43,18 +43,42 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	{
 		m_btnContinueProcessing->Hide();
 	}
+	this->SetMinSize(wxSize(400, 400));
+	// this->Fit();
 }
 
-void FlipDataViewer::OnSpinUp(wxEvent &event)
+void FlipDataViewer::OnSpin(wxEvent &event)
 {
-	// set current page number in m_lblSpinPages
-	m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue()) + " of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
-	// get before processing page data and display in before textctrl
-	m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+	if (m_spinPages->GetValue() <= m_mainFrame->GetPDFPageTotal())
+	{
+		// set current page number in m_lblSpinPages
+		m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue()) + " of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
+		// get before processing page data and display in before textctrl
+		m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
 
-	// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
-	m_dataAfter->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+		// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
+		// m_dataAfter->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
 
-	// log info
-	m_mainFrame->LogMessage("Spin Up Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
+		// log info
+	}
+	else
+	{
+		// prevent spin value from exceeding the maximum number of pages
+		m_spinPages->SetValue(m_spinPages->GetValue() - 1);
+	}
+	m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
 }
+
+// void FlipDataViewer::OnSpinUp(wxEvent &event)
+// {
+// 	// set current page number in m_lblSpinPages
+// 	m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue()) + " of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
+// 	// get before processing page data and display in before textctrl
+// 	m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+
+// 	// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
+// 	//m_dataAfter->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+
+// 	// log info
+// 	m_mainFrame->LogMessage("Spin Up Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
+// }

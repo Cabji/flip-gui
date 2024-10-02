@@ -43,6 +43,9 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	{
 		m_btnContinueProcessing->Hide();
 	}
+	// one off call of OnSpin() to make the page data load into the data viewer
+	wxCommandEvent tripEvent = wxCommandEvent(wxEVT_NULL);
+	OnSpin(tripEvent);
 	m_dataviewerSizer->Layout();
 	this->Fit();
 }

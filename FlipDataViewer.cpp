@@ -33,7 +33,6 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 {
 	// when FlipMain::OnBtnLaunch is clicked and its handler runs, it will trigger an event to be handled in here
 	// this is primarily so we can adjust the widgets in FlipDataViewer to suit what FlipMain is doing
-	m_mainFrame->LogMessage("we are handling a LAUNCH button click in FlipDataViewer!");
 	// check if m_btnContinueProcessing widget should be shown/hidden
 	if (m_mainFrame->GetSwitchValue("dbp"))
 	{

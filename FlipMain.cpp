@@ -444,10 +444,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     if (!m_switchDBP->GetValue())
     {
         OnFlipDataViewerBtnContProcessing(tripEvent);
+        // trigger event so that FlipDataViewer object knows the LAUNCH button was clicked
+        wxPostEvent(m_dataViewer.get(), tripEvent);
     }
     else
     {
-        // trigger event so that FlipDataViewer object knows the LAUNCH button was clicked
         wxPostEvent(m_dataViewer.get(), tripEvent);
     }
     // if FlipMain::LAUNCH was pressed, make the dataViewer frame show()
@@ -457,7 +458,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
 {
     // this method handles a button press from FlipDataViewer::m_btnContinueProcessing
-    // but we could call this method from FlipMain::OnBtnLaunch to continue processing automatically
+    // we also call this method from FlipMain::OnBtnLaunch to continue processing automatically
     // this method will end the PDF data processing (it will carry out the regex substitutions on m_vec_pdfData[x])
     if (m_vec_pdfData.size() <= 0)
     {
@@ -494,7 +495,6 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
                 {
                     m_tempOutput << "No match found for regex: |" + pair_regex.first + "| (quitting processing for this page)";
                     LogMessage(m_tempOutput);
-                    i++;
                     break; // break out of the loop if a regex match fails (means the inut data is not matching our template)
                 }
             }
@@ -503,9 +503,8 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
                 m_tempOutput << "Invalid regex: |" + pair_regex.first + "|";
             }
             LogMessage(m_tempOutput);
-            i++;
         }
-
+        i++;
         // Convert wxString back to std::string after processing
         pdfDataEntry = std::string(wxPdfDataEntry.ToUTF8());
     }

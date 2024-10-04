@@ -37,7 +37,7 @@ Main::Main( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoin
 	m_switchesSizer->SetFlexibleDirection( wxBOTH );
 	m_switchesSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_switchDBP = new wxCheckBox( m_groupSwitches->GetStaticBox(), wxID_ANY, _("Show data before processing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_switchDBP = new wxCheckBox( m_groupSwitches->GetStaticBox(), wxID_ANY, _("Show data before regex processing"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_switchDBP->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOWTEXT ) );
 	m_switchDBP->SetToolTip( _("Raw data pullled from the PDF will be shown before processing occurs. (-dbp)") );
 

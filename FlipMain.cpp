@@ -146,19 +146,44 @@ void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, Rege
         return;
     }
 
-    wxString regexPattern = "^\\s*(\\S.*?)\\s*=>\\s*(.+)$"; // "regex => substitution" pattern
+    wxString regexPattern = "^(.*?)\\s*=>\\s*(.*)$"; // regex to extract program regex/substitution pair
     wxRegEx regexValidator(regexPattern);
 
     for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine())
     {
-        line = line.Trim(true).Trim(false); // Trim whitespace
-
         if (!fnIgnoreLine(line.ToStdString()))
         {
             if (regexValidator.Matches(line))
             {
-                wxString regexString = regexValidator.GetMatch(line, 1);
-                wxString substitutionString = regexValidator.GetMatch(line, 2);
+                wxString regexString = regexValidator.GetMatch(line, 1);        // Get the regex part (with whitespace preserved)
+                wxString substitutionString = regexValidator.GetMatch(line, 2); // Get the substitution part (could be empty)
+
+                // Handle backslashes and convert them to actual escaped values (e.g., "\n" to newline)
+                substitutionString.Replace("\\n", "\n");
+                substitutionString.Replace("\\t", "\t");
+
+                // Section: Convert $1, $2... to \1, \2... but keep \$ as literal $
+                wxString result;
+                for (size_t i = 0; i < substitutionString.Length(); ++i)
+                {
+                    if (substitutionString[i] == '\\' && i + 1 < substitutionString.Length() && substitutionString[i + 1] == '$')
+                    {
+                        // This is a literal $ (preceded by \), so keep it as \$.
+                        result << "\\$";
+                        ++i; // Skip next character since it's part of this escape sequence
+                    }
+                    else if (substitutionString[i] == '$')
+                    {
+                        // Convert $ to \ for regex group substitution
+                        result << '\\';
+                    }
+                    else
+                    {
+                        // Otherwise, just copy the character
+                        result << substitutionString[i];
+                    }
+                }
+                substitutionString = result;
 
                 // Add the pair to the list
                 regexList.push_back(std::make_pair(regexString, substitutionString));
@@ -441,6 +466,7 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
     }
     // Copy m_vec_pdfData to m_vec_pdfDataProcessed
     m_vec_pdfDataProcessed = m_vec_pdfData;
+    auto i = 0; // page counter
 
     // Loop through each entry in m_vec_pdfDataProcessed
     for (std::string &pdfDataEntry : m_vec_pdfDataProcessed)
@@ -451,6 +477,7 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
         // Loop through each regex and substitution pair
         for (const std::pair<wxString, wxString> &pair_regex : m_regexList)
         {
+            m_tempOutput = "Page " + wxString::Format("%i", i) + ": ";
             // Create the regex object for the current pair's first value (the regex pattern)
             wxRegEx regex(pair_regex.first);
 
@@ -461,17 +488,22 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
                 // Replace will return true if a match was found and replaced
                 if (regex.Replace(&wxPdfDataEntry, pair_regex.second))
                 {
-                    LogMessage("Applied regex: |" + pair_regex.first + "| => |" + pair_regex.second + "| on PDF data.");
+                    m_tempOutput << " Applied regex: |" + pair_regex.first + "| => |" + pair_regex.second + "| on PDF data.";
                 }
                 else
                 {
-                    LogMessage("No match found for regex: |" + pair_regex.first + "|");
+                    m_tempOutput << "No match found for regex: |" + pair_regex.first + "| (quitting processing for this page)";
+                    LogMessage(m_tempOutput);
+                    i++;
+                    break; // break out of the loop if a regex match fails (means the inut data is not matching our template)
                 }
             }
             else
             {
-                LogMessage("Invalid regex: |" + pair_regex.first + "|");
+                m_tempOutput << "Invalid regex: |" + pair_regex.first + "|";
             }
+            LogMessage(m_tempOutput);
+            i++;
         }
 
         // Convert wxString back to std::string after processing

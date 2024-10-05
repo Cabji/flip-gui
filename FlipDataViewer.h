@@ -21,6 +21,8 @@ public:
 	/** Constructor */
 	FlipDataViewer(FlipMain *parent);
 	//// end generated class members
+	bool GetBtnContinueProcessingAbility();
+	void ToggleBtnContinueProcessingAbility();
 
 private:
 	void OnBtnContinueProcessing(wxEvent &event);

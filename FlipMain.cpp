@@ -283,6 +283,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     m_vec_pdfData.clear();
     m_vec_pdfDataProcessed.clear();
     m_regexList.clear();
+    // set continue processing buttton to be enabled if it's disabled
+    if (!m_dataViewer->GetBtnContinueProcessingAbility())
+    {
+        m_dataViewer->ToggleBtnContinueProcessingAbility();
+    }
 
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
@@ -512,6 +517,7 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
     // trip the wxEVT_SPIN event in m_dataViewer to make the widgets update
     wxCommandEvent tripEvent(wxEVT_SPIN);
     wxPostEvent(m_dataViewer.get(), tripEvent);
+    m_dataViewer->ToggleBtnContinueProcessingAbility();
     LogMessage("regex processing completed.");
 }
 

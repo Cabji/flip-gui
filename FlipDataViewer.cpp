@@ -17,6 +17,18 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
 }
 
+bool FlipDataViewer::GetBtnContinueProcessingAbility()
+{
+	return m_btnContinueProcessing->IsEnabled();
+}
+
+void FlipDataViewer::ToggleBtnContinueProcessingAbility()
+{
+	// toggle enable/disable state of Continue processing button
+	m_mainFrame->LogMessage("we are toggling the state of the button");
+	m_btnContinueProcessing->Enable(!m_btnContinueProcessing->IsEnabled());
+}
+
 void FlipDataViewer::OnBtnContinueProcessing(wxEvent &event)
 {
 	// trip event to tell FlipMain that the continue processing button was clicked

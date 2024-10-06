@@ -97,7 +97,7 @@ wxString FlipMain::GetPDFPageText(const int pageNum)
 {
     if (pageNum >= 0 && pageNum < m_vec_pdfData.size())
     {
-        return m_vec_pdfData[pageNum];
+        return wxString(m_vec_pdfData[pageNum]);
     }
     return wxEmptyString;
 }
@@ -288,7 +288,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     {
         m_dataViewer->ToggleBtnContinueProcessingAbility();
     }
-
+    // set data viewer::save button to disabled if it enabled
+    if (m_dataViewer->GetBtnSaveAbility())
+    {
+        m_dataViewer->ToggleBtnSaveAbility();
+    }
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
     if (inputFilePath.IsEmpty())
@@ -518,6 +522,7 @@ void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
     wxCommandEvent tripEvent(wxEVT_SPIN);
     wxPostEvent(m_dataViewer.get(), tripEvent);
     m_dataViewer->ToggleBtnContinueProcessingAbility();
+    m_dataViewer->ToggleBtnSaveAbility();
     LogMessage("regex processing completed.");
 }
 

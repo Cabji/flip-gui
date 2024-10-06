@@ -22,7 +22,9 @@ public:
 	FlipDataViewer(FlipMain *parent);
 	//// end generated class members
 	bool GetBtnContinueProcessingAbility();
+	bool GetBtnSaveAbility();
 	void ToggleBtnContinueProcessingAbility();
+	void ToggleBtnSaveAbility();
 
 private:
 	void OnBtnContinueProcessing(wxEvent &event);

@@ -259,6 +259,15 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_btnContinueProcessing = new wxButton( this, wxID_ANY, _("Continue processing ↻"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_dataviewerSizer->Add( m_btnContinueProcessing, wxGBPosition( 4, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
+	wxString m_choice3Choices[] = { _("CSV (text)"), _("SQLite") };
+	int m_choice3NChoices = sizeof( m_choice3Choices ) / sizeof( wxString );
+	m_choice3 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice3NChoices, m_choice3Choices, 0 );
+	m_choice3->SetSelection( 0 );
+	m_dataviewerSizer->Add( m_choice3, wxGBPosition( 5, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+	m_btnSave = new wxButton( this, wxID_ANY, _("💾 Save"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_dataviewerSizer->Add( m_btnSave, wxGBPosition( 5, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
 
 	m_dataviewerSizer->AddGrowableCol( 0 );
 	m_dataviewerSizer->AddGrowableCol( 1 );

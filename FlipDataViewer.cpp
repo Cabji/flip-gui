@@ -7,9 +7,9 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
 {
 	m_mainFrame = parent;
-	// set unordered map to make relation between spinButton widgets and textCtrl widgets (before & after)
 	m_spinPages->SetValue(0);
 	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("Continue processing ↻"));
+	m_btnSave->SetLabel(wxString::FromUTF8("💾 Save"));
 	// event binds
 	Bind(wxEVT_SPIN, &FlipDataViewer::OnSpin, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
@@ -22,11 +22,21 @@ bool FlipDataViewer::GetBtnContinueProcessingAbility()
 	return m_btnContinueProcessing->IsEnabled();
 }
 
+bool FlipDataViewer::GetBtnSaveAbility()
+{
+	return m_btnSave->IsEnabled();
+}
+
 void FlipDataViewer::ToggleBtnContinueProcessingAbility()
 {
 	// toggle enable/disable state of Continue processing button
-	m_mainFrame->LogMessage("we are toggling the state of the button");
 	m_btnContinueProcessing->Enable(!m_btnContinueProcessing->IsEnabled());
+}
+
+void FlipDataViewer::ToggleBtnSaveAbility()
+{
+	// toggle enable/disable state of Continue processing button
+	m_btnSave->Enable(!m_btnSave->IsEnabled());
 }
 
 void FlipDataViewer::OnBtnContinueProcessing(wxEvent &event)
@@ -54,6 +64,14 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	{
 		m_btnContinueProcessing->Hide();
 	}
+	// reset data iewer user-viewable data
+	m_dataBefore->ChangeValue(wxEmptyString);
+	m_dataAfter->ChangeValue(wxEmptyString);
+	m_spinPages->SetValue(0);
+	// set current page number in m_lblSpinPages
+	m_lblSpinPages->SetLabel("Page 0 of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
+	m_btnSave->Disable();
+
 	// one off call of OnSpin() to make the page data load into the data viewer
 	wxCommandEvent tripEvent = wxCommandEvent(wxEVT_NULL);
 	OnSpin(tripEvent);

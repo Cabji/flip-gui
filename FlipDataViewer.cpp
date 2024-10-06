@@ -1,20 +1,22 @@
 #include "FlipDataViewer.h"
 
 // define custom events
-wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, wxCommandEvent);
 
 FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
 {
 	m_mainFrame = parent;
 	m_spinPages->SetValue(0);
-	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("Continue processing ↻"));
+	// ↻
+	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("♻️ Continue processing"));
+	m_btnFinishProcessing->SetLabel(wxString::FromUTF8("🏁 Finish processing"));
 	m_btnSave->SetLabel(wxString::FromUTF8("💾 Save"));
 	// event binds
 	Bind(wxEVT_SPIN, &FlipDataViewer::OnSpin, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
 	Bind(EVT_FLIPMAIN_LAUNCH_CLICKED, &FlipDataViewer::OnFlipMainLaunchClicked, this);
-	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
+	m_btnFinishProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnFinishProcessing, this);
 }
 
 bool FlipDataViewer::GetBtnContinueProcessingAbility()
@@ -39,10 +41,10 @@ void FlipDataViewer::ToggleBtnSaveAbility()
 	m_btnSave->Enable(!m_btnSave->IsEnabled());
 }
 
-void FlipDataViewer::OnBtnContinueProcessing(wxEvent &event)
+void FlipDataViewer::OnBtnFinishProcessing(wxEvent &event)
 {
 	// trip event to tell FlipMain that the continue processing button was clicked
-	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED);
+	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED);
 	wxPostEvent(m_mainFrame, tripEvent);
 }
 

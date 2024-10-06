@@ -54,7 +54,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     this->SetupMenuIcons(this->m_menuFile);
 
     // event handler binds
-    Bind(EVT_FLIPDATAVIEWER_CONTPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnContProcessing, this);
+    Bind(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnFinishProcessing, this);
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
@@ -452,7 +452,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
     if (!m_switchDBP->GetValue())
     {
-        OnFlipDataViewerBtnContProcessing(tripEvent);
+        OnFlipDataViewerBtnFinishProcessing(tripEvent);
         // trigger event so that FlipDataViewer object knows the LAUNCH button was clicked
         wxPostEvent(m_dataViewer.get(), tripEvent);
     }
@@ -464,7 +464,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     m_dataViewer->Show();
 }
 
-void FlipMain::OnFlipDataViewerBtnContProcessing(wxCommandEvent &event)
+void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
 {
     // this method handles a button press from FlipDataViewer::m_btnContinueProcessing
     // we also call this method from FlipMain::OnBtnLaunch to continue processing automatically

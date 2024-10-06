@@ -22,8 +22,10 @@ public:
 	FlipDataViewer(FlipMain *parent);
 	//// end generated class members
 	bool GetBtnContinueProcessingAbility();
+	bool GetBtnFinishProcessingAbility();
 	bool GetBtnSaveAbility();
 	void ToggleBtnContinueProcessingAbility();
+	void ToggleBtnFinishProcessingAbility();
 	void ToggleBtnSaveAbility();
 
 private:

@@ -288,6 +288,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     {
         m_dataViewer->ToggleBtnContinueProcessingAbility();
     }
+    // set Finish processing buttton to be enabled if it's disabled
+    if (!m_dataViewer->GetBtnFinishProcessingAbility())
+    {
+        m_dataViewer->ToggleBtnFinishProcessingAbility();
+    }
     // set data viewer::save button to disabled if it enabled
     if (m_dataViewer->GetBtnSaveAbility())
     {
@@ -522,6 +527,7 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
     wxCommandEvent tripEvent(wxEVT_SPIN);
     wxPostEvent(m_dataViewer.get(), tripEvent);
     m_dataViewer->ToggleBtnContinueProcessingAbility();
+    m_dataViewer->ToggleBtnFinishProcessingAbility();
     m_dataViewer->ToggleBtnSaveAbility();
     LogMessage("regex processing completed.");
 }

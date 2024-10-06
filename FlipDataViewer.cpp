@@ -24,8 +24,14 @@ bool FlipDataViewer::GetBtnContinueProcessingAbility()
 	return m_btnContinueProcessing->IsEnabled();
 }
 
+bool FlipDataViewer::GetBtnFinishProcessingAbility()
+{
+	return m_btnFinishProcessing->IsEnabled();
+}
+
 bool FlipDataViewer::GetBtnSaveAbility()
 {
+	// we should always ensure the wxChoice widget for the save format's status matches the btnSave widget
 	return m_btnSave->IsEnabled();
 }
 
@@ -35,9 +41,16 @@ void FlipDataViewer::ToggleBtnContinueProcessingAbility()
 	m_btnContinueProcessing->Enable(!m_btnContinueProcessing->IsEnabled());
 }
 
+void FlipDataViewer::ToggleBtnFinishProcessingAbility()
+{
+	// toggle enable/disable state of Finish processing button
+	m_btnFinishProcessing->Enable(!m_btnFinishProcessing->IsEnabled());
+}
+
 void FlipDataViewer::ToggleBtnSaveAbility()
 {
-	// toggle enable/disable state of Continue processing button
+	// toggle enable/disable state of Save button & wxChocie widgets
+	m_saveFormat->Enable(!m_saveFormat->IsEnabled());
 	m_btnSave->Enable(!m_btnSave->IsEnabled());
 }
 

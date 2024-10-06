@@ -137,7 +137,7 @@ class DataViewer : public wxFrame
 		wxSpinButton* m_spinPages;
 		wxButton* m_btnContinueProcessing;
 		wxButton* m_btnFinishProcessing;
-		wxChoice* m_choice3;
+		wxChoice* m_saveFormat;
 		wxButton* m_btnSave;
 
 	public:

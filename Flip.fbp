@@ -2011,7 +2011,7 @@
             <property name="style"></property>
             <property name="subclass">; ; forward_declare</property>
             <property name="toolbar_pane">0</property>
-            <property name="tooltip"></property>
+            <property name="tooltip">Continue processing input data using only the next regex from the template</property>
             <property name="validator_data_type"></property>
             <property name="validator_style">wxFILTER_NONE</property>
             <property name="validator_type">wxDefaultValidator</property>
@@ -2088,7 +2088,7 @@
             <property name="style"></property>
             <property name="subclass">; ; forward_declare</property>
             <property name="toolbar_pane">0</property>
-            <property name="tooltip"></property>
+            <property name="tooltip">Finish processing input data using all regexes from the template</property>
             <property name="validator_data_type"></property>
             <property name="validator_style">wxFILTER_NONE</property>
             <property name="validator_type">wxDefaultValidator</property>

@@ -257,9 +257,13 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 	m_dataviewerSizer->Add( m_spinPages, wxGBPosition( 3, 0 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 
 	m_btnContinueProcessing = new wxButton( this, wxID_ANY, _("♻️ Continue processing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btnContinueProcessing->SetToolTip( _("Continue processing input data using only the next regex from the template") );
+
 	m_dataviewerSizer->Add( m_btnContinueProcessing, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
 	m_btnFinishProcessing = new wxButton( this, wxID_ANY, _("🏁 Finish processing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btnFinishProcessing->SetToolTip( _("Finish processing input data using all regexes from the template") );
+
 	m_dataviewerSizer->Add( m_btnFinishProcessing, wxGBPosition( 4, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
 	wxString m_saveFormatChoices[] = { _("CSV (text)"), _("SQLite") };

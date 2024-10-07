@@ -85,6 +85,7 @@ private:
 
 	// private members
 	bool m_useConsoleOutput = false;
+	int m_currentRegex = 0;
 	std::vector<std::string> m_vec_pdfData;
 	std::vector<std::string> m_vec_pdfDataProcessed;
 	wxArrayString m_configTemplateDirs;

@@ -479,6 +479,7 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
         // quit because nothing to do
         return;
     }
+
     // Copy m_vec_pdfData to m_vec_pdfDataProcessed
     m_vec_pdfDataProcessed = m_vec_pdfData;
     auto i = 0; // page counter
@@ -489,10 +490,12 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
         // Convert std::string to wxString for processing
         wxString wxPdfDataEntry = wxString::FromUTF8(pdfDataEntry);
 
-        // Loop through each regex and substitution pair
-        for (const std::pair<wxString, wxString> &pair_regex : m_regexList)
+        // Start processing from the current regex (m_currentRegex) until the end
+        for (size_t regexIdx = m_currentRegex; regexIdx < m_regexList.size(); ++regexIdx)
         {
+            const auto &pair_regex = m_regexList[regexIdx];
             m_tempOutput = "Page " + wxString::Format("%i", i) + ": ";
+
             // Create the regex object for the current pair's first value (the regex pattern)
             wxRegEx regex(pair_regex.first);
 
@@ -500,7 +503,6 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
             if (regex.IsValid())
             {
                 // Perform the substitution on the wxPdfDataEntry
-                // Replace will return true if a match was found and replaced
                 if (regex.Replace(&wxPdfDataEntry, pair_regex.second))
                 {
                     m_tempOutput << " Applied regex: |" + pair_regex.first + "| => |" + pair_regex.second + "| on PDF data.";
@@ -509,27 +511,36 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
                 {
                     m_tempOutput << "No match found for regex: |" + pair_regex.first + "| (quitting processing for this page)";
                     LogMessage(m_tempOutput);
-                    break; // break out of the loop if a regex match fails (means the inut data is not matching our template)
+                    break; // break out of the loop if a regex match fails (means the input data is not matching our template)
                 }
             }
             else
             {
                 m_tempOutput << "Invalid regex: |" + pair_regex.first + "|";
             }
+
             LogMessage(m_tempOutput);
         }
-        i++;
+
+        i++; // Move to the next page
+
         // Convert wxString back to std::string after processing
         pdfDataEntry = std::string(wxPdfDataEntry.ToUTF8());
     }
 
-    // trip the wxEVT_SPIN event in m_dataViewer to make the widgets update
+    // Reset the current regex index after processing is complete
+    m_currentRegex = 0;
+
+    // Trigger the wxEVT_SPIN event in m_dataViewer to make the widgets update
     wxCommandEvent tripEvent(wxEVT_SPIN);
     wxPostEvent(m_dataViewer.get(), tripEvent);
+
+    // Toggle button abilities in the data viewer
     m_dataViewer->ToggleBtnContinueProcessingAbility();
     m_dataViewer->ToggleBtnFinishProcessingAbility();
     m_dataViewer->ToggleBtnSaveAbility();
-    LogMessage("regex processing completed.");
+
+    LogMessage("Regex processing completed.");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

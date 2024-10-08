@@ -55,6 +55,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
 
     // event handler binds
     Bind(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnFinishProcessing, this);
+    Bind(EVT_FLIPDATAVIEWER_CONTINUEPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnContinueProcessing, this);
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
     Bind(wxEVT_MENU, &FlipMain::OnQuit, this, ID_MENU_FILE_QUIT);
     Bind(wxEVT_MENU, &FlipMain::OnShowProgramLog, this, ID_MENU_LOG_PROGRAMLOG);
@@ -283,6 +284,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     m_vec_pdfData.clear();
     m_vec_pdfDataProcessed.clear();
     m_regexList.clear();
+    m_currentRegex = 0;
     // set continue processing buttton to be enabled if it's disabled
     if (!m_dataViewer->GetBtnContinueProcessingAbility())
     {
@@ -467,6 +469,84 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     }
     // if FlipMain::LAUNCH was pressed, make the dataViewer frame show()
     m_dataViewer->Show();
+}
+
+void FlipMain::OnFlipDataViewerBtnContinueProcessing(wxCommandEvent &event)
+{
+    LogMessage("Stepped processing continuing. Current regex = " + wxString::Format("%i", m_currentRegex));
+    // boundary check
+    if (m_vec_pdfData.empty() || m_currentRegex >= m_regexList.size())
+    {
+        LogMessage("Nothing left to process or no regex remaining.");
+        return;
+    }
+
+    // if this is not the first processing run, copy the existing processed pdf data into the m_vec_pdfData vector
+    if (m_currentRegex > 0)
+    {
+        m_vec_pdfData = m_vec_pdfDataProcessed;
+        m_vec_pdfDataProcessed.clear();
+    }
+
+    auto i = 0; // page counter
+
+    // Loop through each entry in m_vec_pdfData
+    for (std::string pdfDataEntry : m_vec_pdfData)
+    {
+        wxString wxPdfDataEntry = wxString::FromUTF8(pdfDataEntry);
+
+        // read current regex => sub pair from m_regexList
+        const auto &pair_regex = m_regexList[m_currentRegex];
+
+        m_tempOutput = "Page " + wxString::Format("%i", i) + ": ";
+
+        // get the regex string as a wxRegEx object
+        wxRegEx regex(pair_regex.first);
+
+        // if the regex string is valid
+        if (regex.IsValid())
+        {
+            // replace data in the page as per regex and sub strings
+            if (regex.Replace(&wxPdfDataEntry, pair_regex.second))
+            {
+                m_tempOutput << " Applied regex: |" + pair_regex.first + "| => |" + pair_regex.second + "| on PDF data.";
+            }
+            else
+            {
+                m_tempOutput << "No match found for regex: |" + pair_regex.first + "| (quitting processing for this page)";
+                LogMessage(m_tempOutput);
+                break; // Exit if the regex match fails
+            }
+        }
+        else
+        {
+            m_tempOutput << "Invalid regex: |" + pair_regex.first + "|";
+        }
+        LogMessage(m_tempOutput);
+
+        // Convert wxString back to std::string after processing
+        pdfDataEntry = std::string(wxPdfDataEntry.ToUTF8());
+        // push the processed data into the m_vec_pdfDataProcessed vector
+        m_vec_pdfDataProcessed.push_back(pdfDataEntry);
+        i++;
+    }
+
+    // Increment the regex counter for the next press of the Continue processing button by the user
+    m_currentRegex++;
+
+    // Trigger Data Viewer to update data displayed in UI widgets
+    wxCommandEvent tripEvent(wxEVT_SPIN);
+    wxPostEvent(m_dataViewer.get(), tripEvent);
+    LogMessage("Stepped processing applied for one regex.");
+
+    // check if we have reached the end and disable/enable buttons as required
+    if (m_currentRegex >= m_regexList.size())
+    {
+        // Toggle button abilities in the data viewer
+        m_dataViewer->ToggleBtnContinueProcessingAbility();
+        m_dataViewer->ToggleBtnFinishProcessingAbility();
+        m_dataViewer->ToggleBtnSaveAbility();
+    }
 }
 
 void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)

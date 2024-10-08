@@ -2,6 +2,7 @@
 
 // define custom events
 wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_CONTINUEPROCESSING_CLICKED, wxCommandEvent);
 
 FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
@@ -17,6 +18,7 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);
 	Bind(EVT_FLIPMAIN_LAUNCH_CLICKED, &FlipDataViewer::OnFlipMainLaunchClicked, this);
 	m_btnFinishProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnFinishProcessing, this);
+	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
 }
 
 bool FlipDataViewer::GetBtnContinueProcessingAbility()
@@ -54,6 +56,13 @@ void FlipDataViewer::ToggleBtnSaveAbility()
 	m_btnSave->Enable(!m_btnSave->IsEnabled());
 }
 
+void FlipDataViewer::OnBtnContinueProcessing(wxEvent &event)
+{
+	// trip event to tell FlipMain that the continue processing button was clicked
+	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_CONTINUEPROCESSING_CLICKED);
+	wxPostEvent(m_mainFrame, tripEvent);
+}
+
 void FlipDataViewer::OnBtnFinishProcessing(wxEvent &event)
 {
 	// trip event to tell FlipMain that the continue processing button was clicked
@@ -79,7 +88,7 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 	{
 		m_btnContinueProcessing->Hide();
 	}
-	// reset data iewer user-viewable data
+	// reset data viewer user-viewable data
 	m_dataBefore->ChangeValue(wxEmptyString);
 	m_dataAfter->ChangeValue(wxEmptyString);
 	m_spinPages->SetValue(0);
@@ -105,14 +114,15 @@ void FlipDataViewer::OnSpin(wxEvent &event)
 		// ensure that the spin value is within the bounds of the processed PDF page data vector
 		if (m_spinPages->GetValue() <= m_mainFrame->GetProcessedPDFPageTotal() - 1)
 		{
-			// get after processing page data and display in after textctrl (NOTE: this line will need to be updated later!)
+			// get after processing page data and display in after textctrl
 			m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(m_spinPages->GetValue()));
 		}
+		m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
 	}
 	else
 	{
 		// prevent spin value from exceeding the maximum number of pages
 		m_spinPages->SetValue(m_spinPages->GetValue() - 1);
+		m_mainFrame->LogMessage("Spin value maximum reached.");
 	}
-	m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
 }

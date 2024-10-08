@@ -202,7 +202,7 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 {
-	// pre-check. if templateFileWasDeleted or current teplate selection is blank, return out.
+	// pre-check. if templateFileWasDeleted or current template selection is blank, return out.
 	if (m_templateFileWasDeleted || m_templateFileWasLoaded || m_templatesExisting->GetCurrentSelection() == wxNOT_FOUND)
 	{
 		// Reset flags and return without doing anything
@@ -227,14 +227,16 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 
 		while (tokenizer.HasMoreTokens())
 		{
-			line = tokenizer.GetNextToken().Trim(true).Trim(false); // Trim whitespace from both sides
+			line = tokenizer.GetNextToken(); // Do not trim initially
 
-			if (blankValidator.Matches(line) || commentValidator.Matches(line))
+			// Check for blank lines or comments (whitespace can be trimmed here for checking)
+			if (blankValidator.Matches(line.Trim(true).Trim(false)) || commentValidator.Matches(line.Trim(true).Trim(false)))
 			{
 				// Ignore blank lines or comments
 				continue;
 			}
 
+			// If the line isn't blank or a comment, preserve the full regex formatting
 			if (!regexValidator.Matches(line))
 			{
 				// If the line doesn't match the "regex => replacement" format
@@ -252,8 +254,8 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 			wxString leftSide = regexValidator.GetMatch(line, 1);
 			wxString rightSide = regexValidator.GetMatch(line, 2);
 
-			// Further processing with leftSide and rightSide can be done here
-			m_mainFrame->LogMessage("Valid regex: " + leftSide + "=> " + rightSide);
+			// Log valid regex
+			m_mainFrame->LogMessage("Valid regex: " + leftSide + " => " + rightSide);
 		}
 
 		if (isValid)

@@ -1,8 +1,9 @@
 #include "FlipDataViewer.h"
 
 // define custom events
-wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_BTNSAVE_CLICKED, wxCommandEvent);
 wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_CONTINUEPROCESSING_CLICKED, wxCommandEvent);
+wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, wxCommandEvent);
 
 FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
@@ -19,6 +20,7 @@ FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	Bind(EVT_FLIPMAIN_LAUNCH_CLICKED, &FlipDataViewer::OnFlipMainLaunchClicked, this);
 	m_btnFinishProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnFinishProcessing, this);
 	m_btnContinueProcessing->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnContinueProcessing, this);
+	m_btnSave->Bind(wxEVT_BUTTON, &FlipDataViewer::OnBtnSave, this);
 }
 
 bool FlipDataViewer::GetBtnContinueProcessingAbility()
@@ -67,6 +69,13 @@ void FlipDataViewer::OnBtnFinishProcessing(wxEvent &event)
 {
 	// trip event to tell FlipMain that the continue processing button was clicked
 	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED);
+	wxPostEvent(m_mainFrame, tripEvent);
+}
+
+void FlipDataViewer::OnBtnSave(wxEvent &event)
+{
+	// trip event for FlipMain to handle the save process
+	wxCommandEvent tripEvent(EVT_FLIPDATAVIEWER_BTNSAVE_CLICKED);
 	wxPostEvent(m_mainFrame, tripEvent);
 }
 

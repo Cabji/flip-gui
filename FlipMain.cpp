@@ -54,6 +54,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     this->SetupMenuIcons(this->m_menuFile);
 
     // event handler binds
+    Bind(EVT_FLIPDATAVIEWER_BTNSAVE_CLICKED, &FlipMain::OnFlipDataViewerBtnSave, this);
     Bind(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnFinishProcessing, this);
     Bind(EVT_FLIPDATAVIEWER_CONTINUEPROCESSING_CLICKED, &FlipMain::OnFlipDataViewerBtnContinueProcessing, this);
     Bind(wxEVT_MENU, &FlipMain::OnAbout, this, ID_MENU_FILE_ABOUT);
@@ -621,6 +622,42 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
     m_dataViewer->ToggleBtnSaveAbility();
 
     LogMessage("Regex processing completed.");
+}
+
+void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
+{
+    // the Save button was clicked in the Data Viewer frame, user wants to save the content from the dataviewer
+    // 1. Data Validation
+    // If no output file provided, use the default output path in the user's home directory
+    wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
+    wxString outFile = m_outputFile->GetTextCtrlValue();
+    wxString outData = wxEmptyString;
+    wxRegEx blankLineRegex("\n[\\s\\n]*$");
+
+    if (outFile == wxEmptyString)
+    {
+        outFile = defaultOutputFilePath;
+    }
+
+    // m_vec_pdfDataProcessed contains the data we want
+    // 2. loop through m_vec_pdfDataProcessed and build all the entries into a single string for saving to disk
+    for (wxString pageData : m_vec_pdfDataProcessed)
+    {
+        // Check for and remove any blank lines (including lines with only whitespace)
+        if (blankLineRegex.Matches(pageData))
+        {
+            LogMessage("we found a blank line and are removing it");
+            blankLineRegex.Replace(&pageData, "\n", wxRE_ADVANCED); // Replace blank lines with a single newline
+        }
+
+        wxString appendChar = '\n';
+        if (!pageData.IsEmpty() && pageData.Last() == '\n')
+        {
+            appendChar = wxEmptyString;
+        }
+        outData << pageData << appendChar;
+    }
+    LogMessage("Data to save: |" + outData + "|");
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

@@ -70,6 +70,7 @@ private:
 	// event handlers
 	void OnAbout(wxCommandEvent &event);
 	void OnBtnLaunch(wxCommandEvent &event);
+	void OnFlipDataViewerBtnSave(wxCommandEvent &event);
 	void OnFlipDataViewerBtnContinueProcessing(wxCommandEvent &event);
 	void OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event);
 	void OnUseTemplateChoice(wxCommandEvent &event);

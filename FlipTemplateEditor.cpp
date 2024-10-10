@@ -202,10 +202,8 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 
 void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 {
-	// pre-check. if templateFileWasDeleted or current template selection is blank, return out.
 	if (m_templateFileWasDeleted || m_templateFileWasLoaded || m_templatesExisting->GetCurrentSelection() == wxNOT_FOUND)
 	{
-		// Reset flags and return without doing anything
 		m_templateFileWasDeleted = false;
 		m_templateFileWasLoaded = false;
 		return;
@@ -215,55 +213,67 @@ void FlipTemplateEditor::OnTemplateEditorAutoSaveTimeout(wxTimerEvent &event)
 	{
 		wxString statusMessage = wxEmptyString;
 		wxString content = m_templateEditor->GetValue();
-		wxStringTokenizer tokenizer(content, "\n");			// Split content by lines
-		wxString regexPattern = "^\\s*(.+)\\s*=>\\s*(.+)$"; // Pattern for "regex => replacement"
-		wxString commentPattern = "^\\s*//.*$|^\\s*#.*$";	// Pattern for comments
-		wxString blankPattern = "^\\s*$";					// Pattern for blank lines
-		wxRegEx regexValidator(regexPattern);
+		wxStringTokenizer tokenizer(content, "\n"); // Split template file content into lines
+		wxString separator = " => ";
+		wxString commentPattern = "^\\s*//.*$|^\\s*#.*$"; // Pattern for comments
+		wxString blankPattern = "^\\s*$";				  // Pattern for blank lines
 		wxRegEx commentValidator(commentPattern);
 		wxRegEx blankValidator(blankPattern);
 		wxString line;
 		bool isValid = true; // Assume the content is valid until proven otherwise
 
+		// Work through the template file line by line
 		while (tokenizer.HasMoreTokens())
 		{
-			line = tokenizer.GetNextToken(); // Do not trim initially
+			line = tokenizer.GetNextToken();
 
-			// Check for blank lines or comments (whitespace can be trimmed here for checking)
-			if (blankValidator.Matches(line.Trim(true).Trim(false)) || commentValidator.Matches(line.Trim(true).Trim(false)))
+			// use a separate variable for trimmed line as it will bugger up the regex checks performed later on
+			wxString trimmedLine = line;
+			trimmedLine.Trim(true).Trim(false);
+			// Check for blank lines or comments
+			if (blankValidator.Matches(trimmedLine) || commentValidator.Matches(trimmedLine))
 			{
 				// Ignore blank lines or comments
 				continue;
 			}
 
-			// If the line isn't blank or a comment, preserve the full regex formatting
-			if (!regexValidator.Matches(line))
+			// Split line into LHS and RHS on " => "
+			int separatorPos = line.Find(separator);
+			if (separatorPos == wxNOT_FOUND)
 			{
-				// If the line doesn't match the "regex => replacement" format
-				wxString errorMessage = wxString::Format("Invalid line: '%s'", line);
+				// Line doesn't have the " => " separator
+				wxString errorMessage = wxString::Format("Invalid line (missing ' => '): '%s'", line);
 				m_mainFrame->LogMessage(errorMessage);
 
-				// Set the status bar text to indicate invalid regex
-				statusMessage << "Template regexes invalid - please check your regexes";
-
-				isValid = false; // Mark as invalid
-				break;			 // Stop further checks
+				statusMessage << "Template regexes invalid - missing ' => ' separator";
+				isValid = false;
+				break;
 			}
 
-			// If we reach here, the line is valid.
-			wxString leftSide = regexValidator.GetMatch(line, 1);
-			wxString rightSide = regexValidator.GetMatch(line, 2);
+			wxString leftSide = line.SubString(0, separatorPos - 1);								   // Extract LHS
+			wxString rightSide = line.SubString(separatorPos + separator.Length(), line.Length() - 1); // Extract RHS
 
-			// Log valid regex
+			// Validate the left side (regex)
+			wxRegEx testRegex;
+			if (!testRegex.Compile(leftSide))
+			{
+				// If the left-side regex is invalid
+				wxString errorMessage = wxString::Format("Invalid regex pattern: '%s'", leftSide);
+				m_mainFrame->LogMessage(errorMessage);
+
+				statusMessage << "Template regexes invalid - invalid regex pattern";
+				isValid = false;
+				break;
+			}
+
+			// Right side (RHS) can be empty, so no further validation needed
 			m_mainFrame->LogMessage("Valid regex: " + leftSide + " => " + rightSide);
 		}
 
 		if (isValid)
 		{
-			// Set the status bar text to indicate valid regex
+			// Save and update status
 			statusMessage << "Template regexes valid";
-
-			// Save the content to the file (after validation)
 			wxFileOutputStream fileStream(m_teCurrentTemplate);
 			if (!fileStream.IsOk())
 			{

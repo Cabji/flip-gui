@@ -123,6 +123,16 @@ int FlipMain::GetProcessedPDFPageTotal()
     return m_vec_pdfDataProcessed.size();
 }
 
+int FlipMain::GetRegexCurrentIndex()
+{
+    return m_currentRegex;
+}
+
+int FlipMain::GetRegexTotal()
+{
+    return m_regexList.size();
+}
+
 bool FlipMain::GetSwitchValue(const wxString &switchName)
 {
     if (switchName.Lower() == "dbp")

@@ -115,18 +115,22 @@ void FlipDataViewer::OnSpin(wxEvent &event)
 {
 	if (m_spinPages->GetValue() <= m_mainFrame->GetPDFPageTotal() - 1)
 	{
+		int currentPage = m_spinPages->GetValue();
+		int currentRegex = m_mainFrame->GetRegexCurrentIndex();
+		int totalPages = m_mainFrame->GetPDFPageTotal();
+		int totalRegexes = m_mainFrame->GetRegexTotal();
 		// set current page number in m_lblSpinPages
-		m_lblSpinPages->SetLabel("Page " + wxString::Format("%i", m_spinPages->GetValue() + 1) + " of " + wxString::Format("%i", m_mainFrame->GetPDFPageTotal()));
+		m_lblSpinPages->SetLabel(wxString::Format("Page %i of %i (Regex %i of %i used)", currentPage + 1, totalPages, currentRegex, totalRegexes));
 		// get before processing page data and display in before textctrl
-		m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(m_spinPages->GetValue()));
+		m_dataBefore->SetValue(m_mainFrame->GetPDFPageText(currentPage));
 
 		// ensure that the spin value is within the bounds of the processed PDF page data vector
 		if (m_spinPages->GetValue() <= m_mainFrame->GetProcessedPDFPageTotal() - 1)
 		{
 			// get after processing page data and display in after textctrl
-			m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(m_spinPages->GetValue()));
+			m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(currentPage));
 		}
-		m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", m_spinPages->GetValue()));
+		m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", currentPage));
 	}
 	else
 	{

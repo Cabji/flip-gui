@@ -31,7 +31,8 @@ Here are some features I'd like to add eventually:
 
 ✔ Side-by-side Data Comparison: view the processed data side by side at each step of processing
 
-- Stepped Data Processing: view the processed data after each regex is applied (filthy feature creep is happening)
+✔ Stepped Data Processing: view the processed data after each regex is applied (filthy feature creep is happening)
+
 - Output: output to CSV file on disk
 - Automation Support: add command line switches & flip-gui "automation" configuration support for fully automated PDF processing
 - Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers

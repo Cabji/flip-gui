@@ -42,6 +42,8 @@ public:
 	wxString GetProcessedPDFPageText(const int pageNum);
 	int GetPDFPageTotal();
 	int GetProcessedPDFPageTotal();
+	int GetRegexCurrentIndex();
+	int GetRegexTotal();
 	bool GetSwitchValue(const wxString &switchName);
 	void LogMessage(wxString message);
 	static bool NormalizeFilePathString(wxString &path);

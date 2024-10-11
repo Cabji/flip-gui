@@ -1,7 +1,10 @@
 # TLDR and Computer Illiterate/(Boomer)
 
 The app will change a PDF into text so you can have your way with it.
-You can get the program by downloading the flip-gui-0.1.zip file listed above.
+
+You can get the program by downloading the file listed below.
+
+https://github.com/Cabji/flip-gui/blob/8ef9df2c084397fa329c3915aa31cc79e3ee22df/flip-gui-0.1.zip
 
 # Overview
 

@@ -1,8 +1,7 @@
 # TLDR and Computer Illiterate/(Boomer)
 
 The app will change a PDF into text so you can have your way with it.
-You can't just download an installer.
-You have to be a computer nerd to actually get the program.
+You can get the program by downloading the flip-gui-0.1.zip file listed above.
 
 # Overview
 
@@ -33,6 +32,7 @@ Here are some features I'd like to add eventually:
 
 ✔ Stepped Data Processing: view the processed data after each regex is applied (filthy feature creep is happening)
 
-- Output: output to CSV file on disk
+✔ Output: output to CSV file on disk
+
 - Automation Support: add command line switches & flip-gui "automation" configuration support for fully automated PDF processing
 - Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers

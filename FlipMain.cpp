@@ -668,6 +668,45 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
         outData << pageData << appendChar;
     }
     LogMessage("Data to save: |" + outData + "|");
+
+    // 3. Save the content to the file using wxTextFile
+    wxTextFile textFile;
+
+    // Try opening the file if it exists, or create a new one
+    if (wxFileExists(outFile))
+    {
+        if (!textFile.Open(outFile))
+        {
+            LogMessage("Failed to open file: " + outFile);
+            wxMessageBox("Failed to open the output file: " + outFile, "Error", wxICON_ERROR);
+            return;
+        }
+        textFile.Clear(); // Clear the content if you're overwriting
+    }
+    else
+    {
+        if (!textFile.Create(outFile))
+        {
+            LogMessage("Failed to create file: " + outFile);
+            wxMessageBox("Failed to create the output file: " + outFile, "Error", wxICON_ERROR);
+            return;
+        }
+    }
+
+    // 4. Write the data to the file
+    textFile.AddLine(outData);
+    if (textFile.Write())
+    {
+        LogMessage("Data successfully written to: " + outFile);
+        wxMessageBox("File saved successfully!", "Success", wxICON_INFORMATION);
+    }
+    else
+    {
+        LogMessage("Failed to write data to file: " + outFile);
+        wxMessageBox("Failed to write to the output file: " + outFile, "Error", wxICON_ERROR);
+    }
+
+    textFile.Close();
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)

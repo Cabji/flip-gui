@@ -16,7 +16,7 @@ C++ with wxWidgets, UI being built using wxFormBuilder. The aim is to write cros
 
 flip-gui (or just, Flip) allow you to input a PDF file, run it through some processing, and extract whatever data you want from the PDF file in plain text format usually this would be in comma separated value (CSV) format. Currently (Oct 2024) the project has the core features that it command line counter part has excluding the planned features listed below in Project Plans.
 
-Flip, by itself is not very useful unless you have a _template_ file configured for the PDF you are processing. I have ranted on about the details of making templates over in the flip-cpp project repo right here on my github, so go check that out if you want to know more. When this project reaches a mature enough stage I will possibly make some videos detailing the best ways to create templates.
+Flip, by itself is not very useful unless you have a _template_ file configured for the PDF you are processing. I have ranted on about the details of making templates over in the flip (PHP) project repo right here on my github, so go check that out if you want to know more. When this project reaches a mature enough stage I will possibly make some videos detailing the best ways to create templates.
 
 # Building
 

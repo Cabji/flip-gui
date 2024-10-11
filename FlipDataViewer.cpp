@@ -8,12 +8,17 @@ wxDEFINE_EVENT(EVT_FLIPDATAVIEWER_FINISHPROCESSING_CLICKED, wxCommandEvent);
 FlipDataViewer::FlipDataViewer(FlipMain *parent)
 	: DataViewer(parent)
 {
+	// initialize members
 	m_mainFrame = parent;
 	m_spinPages->SetValue(0);
-	// ↻
+	// by default dataViewer buttons and m_saveFormat are disabled on construction
 	m_btnContinueProcessing->SetLabel(wxString::FromUTF8("♻️ Continue processing"));
+	m_btnContinueProcessing->Disable();
 	m_btnFinishProcessing->SetLabel(wxString::FromUTF8("🏁 Finish processing"));
+	m_btnFinishProcessing->Disable();
 	m_btnSave->SetLabel(wxString::FromUTF8("💾 Save"));
+	m_btnSave->Disable();
+	m_saveFormat->Disable();
 	// event binds
 	Bind(wxEVT_SPIN, &FlipDataViewer::OnSpin, this);
 	Bind(wxEVT_CLOSE_WINDOW, &FlipDataViewer::OnClose, this);

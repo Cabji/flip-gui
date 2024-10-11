@@ -52,6 +52,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
 
     this->SetSizerAndFit(this->m_mainFrameSizer);
     this->SetupMenuIcons(this->m_menuFile);
+    this->SetupMenuIcons(this->m_menuLog);
 
     // event handler binds
     Bind(EVT_FLIPDATAVIEWER_BTNSAVE_CLICKED, &FlipMain::OnFlipDataViewerBtnSave, this);
@@ -281,7 +282,7 @@ bool FlipMain::NormalizeFilePathString(wxString &path)
 
 void FlipMain::OnAbout(wxCommandEvent &event)
 {
-    wxMessageBox("Developed by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
+    wxMessageBox("Flip v0.1\n\nProcess PDF files and get their data.\n\nDeveloped by cabji - 2024", "About Flip", wxOK | wxICON_INFORMATION, nullptr);
 }
 
 void FlipMain::OnBtnLaunch(wxCommandEvent &event)
@@ -720,7 +721,7 @@ void FlipMain::OnShowDataViewer(wxCommandEvent &event)
     if (m_dataViewer)
     {
         LogMessage("Showing Data Viewer window");
-        m_programLog->Show(true);
+        m_dataViewer->Show(true);
     }
     else
     {

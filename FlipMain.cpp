@@ -28,7 +28,8 @@ wxDEFINE_EVENT(EVT_FLIPMAIN_LAUNCH_CLICKED, wxCommandEvent);
 const wxString FlipMain::RESOURCE_MENU_ICONS_PATH = wxT("/resources/images/menuIcons");
 
 FlipMain::FlipMain(wxWindow *parent)
-    : Main(parent)
+    : Main(parent),
+      m_startupArguments()
 {
 }
 
@@ -37,7 +38,8 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
       FLIP_USER_HOME_PATH(wxGetHomeDir()),
       FLIP_DEFAULT_CONFIG_PATH(wxGetHomeDir() + "/.flip"),
       FLIP_DEFAULT_TEMPLATE_PATH(wxGetHomeDir() + "/.flip/templates"),
-      FLIP_DEFAULT_OUTPUT_FILENAME("flipOutput.txt")
+      FLIP_DEFAULT_OUTPUT_FILENAME("flipOutput.txt"),
+      m_startupArguments()
 {
     // dev-note: const class members must be declared in the constructor's initialiation list
     //           not in the constructor body. (allegedly)
@@ -94,6 +96,12 @@ FlipMain::~FlipMain()
     // destructor
     m_filePollTimer.Stop();
     Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
+}
+
+StartupArgumentsParser FlipMain::GetArgumentsParser()
+{
+    // return the m_startupArguments _instance_
+    return m_startupArguments;
 }
 
 wxString FlipMain::GetPDFPageText(const int pageNum)

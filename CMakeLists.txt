@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(FlipApp)
 
+set(CMAKE_CXX_STANDARD 20)
+
 set(wxWidgets_ROOT_DIR "c:/cpp/cppLibraries/wxWidgets_static")
 set(wxWidgets_LIB_DIR "${wxWidgets_ROOT_DIR}/lib/gcc_x64_lib")
 set(wxWidgets_CONFIGURATION "mswu")
@@ -26,6 +28,7 @@ add_executable(FlipApp
     FlipProgramLog.cpp
     FlipTemplateEditor.cpp
     cabjiFunctions.cpp
+    include/StartupArgumentsParser.cpp
     app.manifest  
 )
 

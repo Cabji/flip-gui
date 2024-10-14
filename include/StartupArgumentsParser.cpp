@@ -25,7 +25,8 @@ std::string ToLower(const std::string &str)
 }
 
 // Constructors and operator=
-StartupArgumentsParser::StartupArgumentsParser() {};
+StartupArgumentsParser::StartupArgumentsParser() {
+};
 
 StartupArgumentsParser::StartupArgumentsParser(int argc, char *argv[])
 {
@@ -44,27 +45,6 @@ StartupArgumentsParser &StartupArgumentsParser::operator=(const StartupArguments
 	}
 	return *this;
 }
-
-// // Constructor
-// StartupArgumentsParser::StartupArgumentsParser(int argc, char *argv[])
-// {
-// 	std::string currentSwitch;
-// 	for (int i = 1; i < argc; ++i)
-// 	{
-// 		std::string arg = argv[i];
-
-// 		if (IsSwitch(arg))
-// 		{
-// 			currentSwitch = NormalizeSwitchName(arg);
-// 			m_arguments[currentSwitch] = ""; // Initialize with empty value
-// 		}
-// 		else if (!currentSwitch.empty())
-// 		{
-// 			m_arguments[currentSwitch] = arg;
-// 			currentSwitch.clear(); // Reset switch after assigning value
-// 		}
-// 	}
-// }
 
 // Class methods
 void StartupArgumentsParser::DisplayAllSwitches() const
@@ -145,7 +125,7 @@ void StartupArgumentsParser::Parse(int argc, char *argv[])
 {
 	std::string currentSwitch;
 
-	for (int i = 1; i < argc; ++i)
+	for (int i = 0; i < argc; i++)
 	{
 		std::string arg = argv[i];
 
@@ -153,10 +133,10 @@ void StartupArgumentsParser::Parse(int argc, char *argv[])
 		{
 			currentSwitch = NormalizeSwitchName(arg);
 
-			// Ensure normalized switch name is used consistently
+			// check if this switch is a toggle (boolean) by determining if the next index value is a switch or not
 			if ((i + 1) < argc && !IsSwitch(argv[i + 1]))
 			{
-				m_arguments[currentSwitch] = argv[++i];
+				m_arguments[currentSwitch] = argv[i + 1];
 			}
 			else
 			{

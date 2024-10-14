@@ -16,8 +16,6 @@ bool MyApp::OnInit()
     // initialize main frame
     wxImage::AddHandler(new wxPNGHandler());
     FlipMain *frame = new FlipMain(nullptr, wxID_ANY, "Flip", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
-    frame->GetArgumentsParser().Parse(argc, argv);
-
     // handle command line switches
     bool useConsoleOutput = false;
 
@@ -46,6 +44,15 @@ bool MyApp::OnInit()
             break;
         }
         // add more on startup switches as required...
+    }
+
+    frame->GetArgumentsParser().Parse(argc, argv);
+    std::map<std::string, std::string> passedArgs = frame->GetArgumentsParser().GetArguments();
+
+    std::cout << "Size of passedArgs: " << passedArgs.size() << std::endl;
+    for (const auto &[arg, value] : passedArgs)
+    {
+        std::cout << "Argument: " << arg << "; Value: " << value << std::endl;
     }
 
     frame->Show(true);

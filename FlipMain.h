@@ -39,7 +39,7 @@ public:
 	// cutom constructor declared below here
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
-	StartupArgumentsParser GetArgumentsParser();
+	StartupArgumentsParser &GetArgumentsParser();
 	wxString GetPDFPageText(const int pageNum);
 	wxString GetProcessedPDFPageText(const int pageNum);
 	int GetPDFPageTotal();

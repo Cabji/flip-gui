@@ -98,7 +98,7 @@ FlipMain::~FlipMain()
     Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
 }
 
-StartupArgumentsParser FlipMain::GetArgumentsParser()
+StartupArgumentsParser &FlipMain::GetArgumentsParser()
 {
     // return the m_startupArguments _instance_
     return m_startupArguments;

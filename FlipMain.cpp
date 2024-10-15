@@ -869,6 +869,12 @@ void FlipMain::SetUseConsoleOutput(const bool v)
     m_useConsoleOutput = v;
 }
 
+bool FlipMain::SetInputFilename(wxString filename)
+{
+    m_inputFile->SetPath(filename);
+    return true;
+}
+
 void FlipMain::SetupMenuIcons(wxMenu *menu)
 {
 

@@ -51,6 +51,7 @@ public:
 	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();
 	void SetUseConsoleOutput(const bool v);
+	bool SetInputFilename(wxString filename);
 	void UpdateTemplateChoices();
 
 	// widget related methods

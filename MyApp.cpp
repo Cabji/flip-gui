@@ -46,10 +46,26 @@ bool MyApp::OnInit()
 #endif
             tempOut += "Console mode enabled. Output redirected.\n";
         }
-        else if (switchName == "help")
+        else if (switchName == "help" || switchName == "h" || switchName == "?")
         {
-            tempOut += "Flip - process PDF file to extract data\n\nUsage: " + binaryFilename + " [--switch] [value]\n";
+            tempOut += "Flip - process PDF file to extract data\n\nUsage: " + binaryFilename + " [--switch] [value]\n\n";
+            tempOut += "\tSwitch Name\t\tValue\n";
+            tempOut += "\t--------------------------------------------------------------------------------\n";
+            tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
         }
+        else if (switchName == "input" || switchName == "if" || switchName == "inputfile")
+        {
+            frame->SetInputFilename(wxString(value));
+            tempOut += "  Input file set to: " + value + "\n";
+        }
+        // input file
+        // -dbp (data before processing)
+        // -sws (strip whitespace)
+        // -pages (page range value)
+        // template file
+        // output file
+        // save program log perhaps?
+        // a switch to confirm automated processing (as opposed to just setting all the values and waiting for the LAUNCH button to be clicked in the GUI)
     }
 
     std::cout << tempOut << std::endl;

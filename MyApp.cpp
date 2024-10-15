@@ -13,15 +13,19 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
-    // initialize main frame
+    // data initialization
     wxImage::AddHandler(new wxPNGHandler());
     FlipMain *frame = new FlipMain(nullptr, wxID_ANY, "Flip", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
-    // handle command line switches
-    bool useConsoleOutput = false;
+    frame->GetArgumentsParser().Parse(argc, argv);
+    // get binary filename only (no absolute path)
+    std::string binaryFilename = argv[0].substr(argv[0].find_last_of("/\\") + 1).ToUTF8().data();
+    std::map<std::string, std::string> passedArgs = frame->GetArgumentsParser().GetArguments();
+    std::string tempOut = "";
 
-    for (int i = 1; i < argc; ++i)
+    // handle command line switches
+    for (const auto &[switchName, value] : passedArgs)
     {
-        if (wxString(argv[i]).IsSameAs("--console", false))
+        if (switchName == "console")
         {
             frame->SetUseConsoleOutput(true);
 #ifdef __WXMSW__
@@ -40,20 +44,15 @@ bool MyApp::OnInit()
             // On Unix-like systems, output is typically already visible in the terminal.
             // No special action needed unless you want to explicitly manage I/O streams.
 #endif
-            std::cout << "Console mode enabled. Output redirected." << std::endl;
-            break;
+            tempOut += "Console mode enabled. Output redirected.\n";
         }
-        // add more on startup switches as required...
+        else if (switchName == "help")
+        {
+            tempOut += "Flip - process PDF file to extract data\n\nUsage: " + binaryFilename + " [--switch] [value]\n";
+        }
     }
 
-    frame->GetArgumentsParser().Parse(argc, argv);
-    std::map<std::string, std::string> passedArgs = frame->GetArgumentsParser().GetArguments();
-
-    std::cout << "Size of passedArgs: " << passedArgs.size() << std::endl;
-    for (const auto &[arg, value] : passedArgs)
-    {
-        std::cout << "Argument: " << arg << "; Value: " << value << std::endl;
-    }
+    std::cout << tempOut << std::endl;
 
     frame->Show(true);
     return true;

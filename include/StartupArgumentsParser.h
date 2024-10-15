@@ -27,6 +27,7 @@ public:
 	StartupArgumentsParser(const StartupArgumentsParser &other);
 	StartupArgumentsParser &operator=(const StartupArgumentsParser &other);
 
+	// class methods
 	void DisplayAllSwitches() const;
 	const ArgMap &GetArguments() const;
 	const std::vector<std::string> &GetErrors() const;

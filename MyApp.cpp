@@ -58,7 +58,16 @@ bool MyApp::OnInit()
             frame->SetInputFilename(wxString(value));
             tempOut += "  Input file set to: " + value + "\n";
         }
-        // input file
+        else if (switchName == "dbp")
+        {
+            frame->SetSwitchDBP();
+            tempOut += "  Switch set: -dbp (Show data before regex processing)\n";
+        }
+        else if (switchName == "sws")
+        {
+            frame->SetSwitchSWS();
+            tempOut += "  Switch set: -sws (Strip excessive whitespace)\n";
+        }
         // -dbp (data before processing)
         // -sws (strip whitespace)
         // -pages (page range value)

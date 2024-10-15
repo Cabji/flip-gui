@@ -52,6 +52,8 @@ public:
 	TemplateMap ReadUserTemplates();
 	void SetUseConsoleOutput(const bool v);
 	bool SetInputFilename(wxString filename);
+	bool SetSwitchDBP();
+	bool SetSwitchSWS();
 	void UpdateTemplateChoices();
 
 	// widget related methods

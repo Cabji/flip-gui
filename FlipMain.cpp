@@ -875,6 +875,18 @@ bool FlipMain::SetInputFilename(wxString filename)
     return true;
 }
 
+bool FlipMain::SetSwitchDBP()
+{
+    m_switchDBP->SetValue(true);
+    return true;
+}
+
+bool FlipMain::SetSwitchSWS()
+{
+    m_switchSWS->SetValue(true);
+    return true;
+}
+
 void FlipMain::SetupMenuIcons(wxMenu *menu)
 {
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-// Utility functions
+// Utility Functions
 std::vector<std::string> Split(const std::string &str, char delimiter)
 {
 	std::vector<std::string> tokens;
@@ -24,9 +24,8 @@ std::string ToLower(const std::string &str)
 	return lowerStr;
 }
 
-// Constructors and operator=
-StartupArgumentsParser::StartupArgumentsParser() {
-};
+// Constructors and Assignment Operator
+StartupArgumentsParser::StartupArgumentsParser() {}
 
 StartupArgumentsParser::StartupArgumentsParser(int argc, char *argv[])
 {
@@ -46,7 +45,7 @@ StartupArgumentsParser &StartupArgumentsParser::operator=(const StartupArguments
 	return *this;
 }
 
-// Class methods
+// Class Methods
 void StartupArgumentsParser::DisplayAllSwitches() const
 {
 	if (m_arguments.empty())
@@ -58,36 +57,35 @@ void StartupArgumentsParser::DisplayAllSwitches() const
 	std::cout << "Parsed switches and their values:" << std::endl;
 	for (const auto &entry : m_arguments)
 	{
-		std::cout << "--" << entry.first << " = " << (entry.second.empty() ? "(empty)" : entry.second) << std::endl;
+		std::cout << "--" << entry.first << " = "
+				  << (entry.second.empty() ? "(empty)" : entry.second) << std::endl;
 	}
 }
 
 bool StartupArgumentsParser::HasSwitch(const std::string &switchName) const
 {
-	return m_arguments.find(ToLower(switchName)) != m_arguments.end();
+	std::string normalizedSwitch = ToLower(switchName);
+	return std::any_of(m_arguments.begin(), m_arguments.end(),
+					   [&](const auto &entry)
+					   { return entry.first == normalizedSwitch; });
 }
 
 bool StartupArgumentsParser::IsInteger(const std::string &str) const
 {
-	if (str.empty())
-		return false;
-	for (char c : str)
-	{
-		if (!isdigit(c))
-			return false;
-	}
-	return true;
+	return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
 }
 
 bool StartupArgumentsParser::IsSwitch(const std::string &arg) const
 {
-	return (arg.starts_with("--") || arg.starts_with("-") || arg.starts_with("/"));
+	return arg.starts_with("--") || arg.starts_with("-") || arg.starts_with("/");
 }
 
 bool StartupArgumentsParser::IsSwitchPresent(const std::string &switchName) const
 {
 	std::string normalizedSwitch = NormalizeSwitchName(switchName);
-	return m_arguments.find(normalizedSwitch) != m_arguments.end();
+	return std::any_of(m_arguments.begin(), m_arguments.end(),
+					   [&](const auto &entry)
+					   { return entry.first == normalizedSwitch; });
 }
 
 const ArgMap &StartupArgumentsParser::GetArguments() const
@@ -102,30 +100,26 @@ const std::vector<std::string> &StartupArgumentsParser::GetErrors() const
 
 std::string StartupArgumentsParser::GetValue(const std::string &switchName, const std::string &defaultValue) const
 {
-	auto it = m_arguments.find(ToLower(switchName));
-	if (it != m_arguments.end())
-	{
-		return it->second;
-	}
-	return defaultValue;
+	auto it = std::find_if(m_arguments.begin(), m_arguments.end(),
+						   [&](const auto &entry)
+						   { return entry.first == ToLower(switchName); });
+	return it != m_arguments.end() ? it->second : defaultValue;
 }
 
 std::optional<std::string> StartupArgumentsParser::GetSwitchValue(const std::string &switchName) const
 {
 	std::string normalizedSwitch = NormalizeSwitchName(switchName);
-	auto it = m_arguments.find(normalizedSwitch);
-	if (it != m_arguments.end() && !it->second.empty())
-	{
-		return it->second;
-	}
-	return std::nullopt;
+	auto it = std::find_if(m_arguments.begin(), m_arguments.end(),
+						   [&](const auto &entry)
+						   { return entry.first == normalizedSwitch; });
+	return (it != m_arguments.end() && !it->second.empty()) ? std::optional(it->second) : std::nullopt;
 }
 
 void StartupArgumentsParser::Parse(int argc, char *argv[])
 {
 	std::string currentSwitch;
 
-	for (int i = 0; i < argc; i++)
+	for (int i = 0; i < argc; ++i)
 	{
 		std::string arg = argv[i];
 
@@ -133,14 +127,13 @@ void StartupArgumentsParser::Parse(int argc, char *argv[])
 		{
 			currentSwitch = NormalizeSwitchName(arg);
 
-			// check if this switch is a toggle (boolean) by determining if the next index value is a switch or not
 			if ((i + 1) < argc && !IsSwitch(argv[i + 1]))
 			{
-				m_arguments[currentSwitch] = argv[i + 1];
+				m_arguments.emplace_back(currentSwitch, argv[i + 1]);
 			}
 			else
 			{
-				m_arguments[currentSwitch] = "true";
+				m_arguments.emplace_back(currentSwitch, "true");
 			}
 		}
 		else
@@ -160,13 +153,9 @@ std::vector<int> StartupArgumentsParser::ParsePageRange(const std::string &pages
 	{
 		if (token.find('-') != std::string::npos)
 		{
-			// Handle range: e.g., "3-5"
 			size_t dashPos = token.find('-');
-			std::string startStr = token.substr(0, dashPos);
-			std::string endStr = token.substr(dashPos + 1);
-
-			int start = SafeStringToInt(startStr, -1);
-			int end = SafeStringToInt(endStr, -1);
+			int start = SafeStringToInt(token.substr(0, dashPos), -1);
+			int end = SafeStringToInt(token.substr(dashPos + 1), -1);
 
 			if (start > 0 && end >= start)
 			{
@@ -182,7 +171,6 @@ std::vector<int> StartupArgumentsParser::ParsePageRange(const std::string &pages
 		}
 		else
 		{
-			// Handle single page numbers
 			int page = SafeStringToInt(token, -1);
 			if (page > 0)
 			{
@@ -213,14 +201,8 @@ int StartupArgumentsParser::SafeStringToInt(const std::string &str, int defaultV
 	{
 		return std::stoi(str);
 	}
-	catch (const std::invalid_argument &e)
+	catch (...)
 	{
-		std::cerr << "Invalid argument for integer conversion: " << str << std::endl;
-		return defaultValue;
-	}
-	catch (const std::out_of_range &e)
-	{
-		std::cerr << "Out of range error for integer conversion: " << str << std::endl;
 		return defaultValue;
 	}
 }

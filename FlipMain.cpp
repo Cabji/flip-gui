@@ -869,7 +869,7 @@ void FlipMain::SetUseConsoleOutput(const bool v)
     m_useConsoleOutput = v;
 }
 
-bool FlipMain::SetInputFilename(wxString filename)
+bool FlipMain::SetInputFilename(const wxString &filename)
 {
     m_inputFile->SetPath(filename);
     return true;
@@ -884,6 +884,12 @@ bool FlipMain::SetSwitchDBP()
 bool FlipMain::SetSwitchSWS()
 {
     m_switchSWS->SetValue(true);
+    return true;
+}
+
+bool FlipMain::SetSwitchPages(const wxString &value)
+{
+    m_ProcessPages->SetValue(value);
     return true;
 }
 

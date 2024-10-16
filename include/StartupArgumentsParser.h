@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-// Alias for storing parsed arguments
-using ArgMap = std::map<std::string, std::string>;
+// Alias for storing parsed arguments in insertion order
+using ArgMap = std::vector<std::pair<std::string, std::string>>;
 
 class StartupArgumentsParser
 {
@@ -18,7 +18,7 @@ private:
 	bool IsInteger(const std::string &str) const;
 	bool IsSwitch(const std::string &arg) const;
 	std::string NormalizeSwitchName(const std::string &arg) const;
-	int SafeStringToInt(const std::string &str, int defaultValue = 0) const;
+	int SafeStringToInt(const std::string &str, int defaultValue = -1) const;
 
 public:
 	// Constructors and operator=

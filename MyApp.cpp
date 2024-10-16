@@ -1,5 +1,6 @@
 #include "MyApp.h"
 #include "FlipMain.h"
+#include "cabjiFunctions.h"
 #include "include/StartupArgumentsParser.h"
 #include <wx/wx.h>
 #include <wx/image.h>
@@ -52,6 +53,8 @@ bool MyApp::OnInit()
             tempOut += "\tSwitch Name\t\tValue\n";
             tempOut += "\t--------------------------------------------------------------------------------\n";
             tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
+            tempOut += "\tdbp\t\t\tShow data before regex processing (stepped processing)\n";
+            tempOut += "\tsws\t\t\tStrip excessive whitspace from input data\n";
         }
         else if (switchName == "input" || switchName == "if" || switchName == "inputfile")
         {
@@ -68,8 +71,15 @@ bool MyApp::OnInit()
             frame->SetSwitchSWS();
             tempOut += "  Switch set: -sws (Strip excessive whitespace)\n";
         }
-        // -dbp (data before processing)
-        // -sws (strip whitespace)
+        else if (switchName == "page" || switchName == "p")
+        {
+            std::set<int> success = fnParsePageSelection(value);
+            if (!success.empty())
+            {
+                frame->SetSwitchPages(wxString(frame->GetArgumentsParser().GetValue(switchName)));
+            }
+            tempOut += "  Switch set: process pages " + value + "\n";
+        }
         // -pages (page range value)
         // template file
         // output file

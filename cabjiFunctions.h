@@ -20,6 +20,13 @@ bool fnIgnoreLine(const std::string &str);
 /**
  * @brief Parses the page selection string from user input
  * @param pageSelection std::string - String to parse
+ * @param outString std::string - Output string
+ */
+std::set<int> fnParsePageSelection(const std::string &pageSelection, std::string *outString);
+
+/**
+ * @brief Parses the page selection string from user input
+ * @param pageSelection std::string - String to parse
  */
 std::set<int> fnParsePageSelection(const std::string &pageSelection);
 

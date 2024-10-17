@@ -7,7 +7,7 @@ bool fnIgnoreLine(const std::string &str)
 	return str.size() >= 2 && (str[0] == '/' && str[1] == '/') || str[0] == '#' || str == "";
 }
 
-std::set<int> fnParsePageSelection(const std::string &pageSelection)
+std::set<int> fnParsePageSelection(const std::string &pageSelection, std::string *outString)
 {
 	std::set<int> pages;
 
@@ -15,13 +15,28 @@ std::set<int> fnParsePageSelection(const std::string &pageSelection)
 	std::regex validPattern("^[0-9,\\-\\s]*$");
 	if (!std::regex_match(pageSelection, validPattern))
 	{
-		std::cout << "Error: Invalid characters in page selection string.\n";
+		if (outString != nullptr)
+		{
+			*outString += "Error: Invalid characters in page selection string.\n";
+		}
+		else
+		{
+			std::cout << "Error: Invalid characters in page selection string.\n";
+		}
+
 		return pages; // Return empty set if invalid characters are found
 	}
 
 	if (pageSelection.empty())
 	{
-		std::cout << "Error: Empty page selection string.\n";
+		if (outString != nullptr)
+		{
+			*outString += "Error: Empty page selection string.\n";
+		}
+		else
+		{
+			std::cout << "Error: Empty page selection string.\n";
+		}
 		return pages; // Return empty set for empty input
 	}
 
@@ -38,7 +53,14 @@ std::set<int> fnParsePageSelection(const std::string &pageSelection)
 			std::vector<std::string> range = fnStrSplitToVector(trimmedElement, "-");
 			if (range.size() != 2)
 			{
-				std::cout << "Error: Invalid range in page selection: " << trimmedElement << "\n";
+				if (outString != nullptr)
+				{
+					*outString += "Error: Invalid range in page selection: " + trimmedElement + "\n";
+				}
+				else
+				{
+					std::cout << "Error: Invalid range in page selection: " << trimmedElement << "\n";
+				}
 				return pages; // Return empty set if range is invalid
 			}
 
@@ -57,12 +79,26 @@ std::set<int> fnParsePageSelection(const std::string &pageSelection)
 			}
 			catch (const std::invalid_argument &e)
 			{
-				std::cout << "Error: Invalid number format in range: " << e.what() << "\n";
+				if (outString != nullptr)
+				{
+					*outString += "Error: Invalid number format in range: " + std::string(e.what()) + "\n";
+				}
+				else
+				{
+					std::cout << "Error: Invalid number format in range: " << std::string(e.what()) << "\n";
+				}
 				return pages;
 			}
 			catch (const std::out_of_range &e)
 			{
-				std::cout << "Error: Number out of range: " << e.what() << "\n";
+				if (outString != nullptr)
+				{
+					*outString += "Error: Number out of range: " + std::string(e.what()) + "\n";
+				}
+				else
+				{
+					std::cout << "Error: Number out of range: " << std::string(e.what()) << "\n";
+				}
 				return pages;
 			}
 		}
@@ -75,18 +111,38 @@ std::set<int> fnParsePageSelection(const std::string &pageSelection)
 			}
 			catch (const std::invalid_argument &e)
 			{
-				std::cout << "Error: Invalid number format: " << e.what() << "\n";
+				if (outString != nullptr)
+				{
+					*outString += "Error: Invalid number format: " + std::string(e.what()) + "\n";
+				}
+				else
+				{
+					std::cout << "Error: Invalid number format: " << std::string(e.what()) << "\n";
+				}
 				return pages;
 			}
 			catch (const std::out_of_range &e)
 			{
-				std::cout << "Error: Number out of range: " << e.what() << "\n";
+				if (outString != nullptr)
+				{
+					*outString += "Error: Number out of range: " + std::string(e.what()) + "\n";
+				}
+				else
+				{
+					std::cout << "Error: Number out of range: " << std::string(e.what()) << "\n";
+				}
 				return pages;
 			}
 		}
 	}
 
 	return pages;
+}
+
+std::set<int> fnParsePageSelection(const std::string &pageSelection)
+{
+	std::string fakeStr;
+	return fnParsePageSelection(pageSelection, &fakeStr);
 }
 
 void fnStrNormalizeNewLineChars(std::string &s)

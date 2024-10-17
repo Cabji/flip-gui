@@ -20,12 +20,22 @@ bool MyApp::OnInit()
     frame->GetArgumentsParser().Parse(argc, argv);
     // get binary filename only (no absolute path)
     std::string binaryFilename = argv[0].substr(argv[0].find_last_of("/\\") + 1).ToUTF8().data();
-    std::map<std::string, std::string> passedArgs = frame->GetArgumentsParser().GetArguments();
+    std::vector<std::pair<std::string, std::string>> passedArgs = frame->GetArgumentsParser().GetArguments();
     std::string tempOut = "";
 
+    // for (const auto &[switchName, value] : passedArgs)
+    // {
+    //     std::cout << switchName << std::endl;
+    // }
     // handle command line switches
+    int i = 0;
     for (const auto &[switchName, value] : passedArgs)
     {
+        if (i == 0)
+        {
+            tempOut += "Start of tempout\n";
+            i = 1;
+        }
         if (switchName == "console")
         {
             frame->SetUseConsoleOutput(true);

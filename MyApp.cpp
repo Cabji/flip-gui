@@ -23,19 +23,8 @@ bool MyApp::OnInit()
     std::vector<std::pair<std::string, std::string>> passedArgs = frame->GetArgumentsParser().GetArguments();
     std::string tempOut = "";
 
-    // for (const auto &[switchName, value] : passedArgs)
-    // {
-    //     std::cout << switchName << std::endl;
-    // }
-    // handle command line switches
-    int i = 0;
     for (const auto &[switchName, value] : passedArgs)
     {
-        if (i == 0)
-        {
-            tempOut += "Start of tempout\n";
-            i = 1;
-        }
         if (switchName == "console")
         {
             frame->SetUseConsoleOutput(true);
@@ -55,7 +44,7 @@ bool MyApp::OnInit()
             // On Unix-like systems, output is typically already visible in the terminal.
             // No special action needed unless you want to explicitly manage I/O streams.
 #endif
-            tempOut += "Console mode enabled. Output redirected.\n";
+            tempOut += "\nConsole mode enabled. Output redirected.\n";
         }
         else if (switchName == "help" || switchName == "h" || switchName == "?")
         {
@@ -83,14 +72,13 @@ bool MyApp::OnInit()
         }
         else if (switchName == "page" || switchName == "p")
         {
-            std::set<int> success = fnParsePageSelection(value);
+            tempOut += "  Switch set: -" + switchName + " (Process pages) " + value + "\n";
+            std::set<int> success = fnParsePageSelection(value, &tempOut);
             if (!success.empty())
             {
                 frame->SetSwitchPages(wxString(frame->GetArgumentsParser().GetValue(switchName)));
             }
-            tempOut += "  Switch set: process pages " + value + "\n";
         }
-        // -pages (page range value)
         // template file
         // output file
         // save program log perhaps?

@@ -23,11 +23,14 @@ class FlipTemplateEditor; // FlipMain and FlipTemplateEditor share common data t
 class FlipDataViewer;
 
 // declare custom types/events
-WX_DECLARE_STRING_HASH_MAP(wxString, TemplateMap);
+// WX_DECLARE_STRING_HASH_MAP(wxString, TemplateMap);
 wxDECLARE_EVENT(EVT_TEMPLATE_LIST_UPDATED, wxCommandEvent);
 wxDECLARE_EVENT(EVT_FLIPMAIN_LAUNCH_CLICKED, wxCommandEvent);
-// type to hold regex and substitution string pairs
-typedef wxVector<std::pair<wxString, wxString>> RegexSubstitutionList;
+
+// type aliases
+// typedef wxVector<std::pair<wxString, wxString>> RegexSubstitutionList;
+using RegexSubstitutionList = wxVector<std::pair<wxString, wxString>>;
+using TemplateMap = std::unordered_map<wxString, wxString>;
 
 /** Implementing Main */
 class FlipMain : public Main
@@ -47,6 +50,7 @@ public:
 	int GetRegexCurrentIndex();
 	int GetRegexTotal();
 	bool GetSwitchValue(const wxString &switchName);
+	bool GetIsPDFPageRekt(const int &pageNum);
 	void LogMessage(wxString message);
 	static bool NormalizeFilePathString(wxString &path);
 	TemplateMap ReadUserTemplates();
@@ -55,6 +59,7 @@ public:
 	bool SetSwitchDBP();
 	bool SetSwitchSWS();
 	bool SetSwitchPages(const wxString &value);
+	bool SetSwitchTemplateFile(const wxString &filename);
 	void UpdateTemplateChoices();
 
 	// widget related methods
@@ -97,6 +102,7 @@ private:
 	StartupArgumentsParser m_startupArguments;
 	bool m_useConsoleOutput = false;
 	int m_currentRegex = 0;
+	std::vector<int> m_vec_pdfDataRektPages;
 	std::vector<std::string> m_vec_pdfData;
 	std::vector<std::string> m_vec_pdfDataProcessed;
 	wxArrayString m_configTemplateDirs;

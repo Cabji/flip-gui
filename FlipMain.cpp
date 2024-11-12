@@ -158,6 +158,11 @@ bool FlipMain::GetSwitchValue(const wxString &switchName)
     }
 }
 
+bool FlipMain::GetIsPDFPageRekt(const int &pageNum)
+{
+    return std::find(m_vec_pdfDataRektPages.begin(), m_vec_pdfDataRektPages.end(), pageNum) != m_vec_pdfDataRektPages.end();
+}
+
 void FlipMain::LoadRegexSubstitutionPairs(const wxString &templateFilePath, RegexSubstitutionList &regexList)
 {
     wxTextFile file(templateFilePath);
@@ -609,6 +614,8 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
                 }
                 else
                 {
+                    // save failed page number in m_vec_pdfDataRektPages
+                    m_vec_pdfDataRektPages.push_back(i);
                     m_tempOutput << "No match found for regex: |" + pair_regex.first + "| (quitting processing for this page)";
                     LogMessage(m_tempOutput);
                     break; // break out of the loop if a regex match fails (means the input data is not matching our template)
@@ -824,10 +831,6 @@ void FlipMain::OnTemplateFilePoll(wxTimerEvent &event)
 
 void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
 {
-    // scope: we are in an instance of FlipMain
-    // auto className = typeid(*this).name(); // get class name of object that triggered the event
-    // auto pointerInfo = wxString::Format("Pointer: %p", this); // get the object's pointer address
-
     // get a pointer to the object that triggered the OnChoice event
     wxChoice *choice = static_cast<wxChoice *>(event.GetEventObject());
     int selection = choice->GetSelection();
@@ -890,6 +893,13 @@ bool FlipMain::SetSwitchSWS()
 bool FlipMain::SetSwitchPages(const wxString &value)
 {
     m_ProcessPages->SetValue(value);
+    return true;
+}
+
+bool FlipMain::SetSwitchTemplateFile(const wxString &filename)
+{
+    int index = m_useTemplate->Append(filename);
+    m_useTemplate->Select(index);
     return true;
 }
 

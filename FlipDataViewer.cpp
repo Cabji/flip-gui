@@ -118,6 +118,7 @@ void FlipDataViewer::OnFlipMainLaunchClicked(wxEvent &event)
 
 void FlipDataViewer::OnSpin(wxEvent &event)
 {
+	// check requested page number is valid
 	if (m_spinPages->GetValue() <= m_mainFrame->GetPDFPageTotal() - 1)
 	{
 		int currentPage = m_spinPages->GetValue();
@@ -134,6 +135,17 @@ void FlipDataViewer::OnSpin(wxEvent &event)
 		{
 			// get after processing page data and display in after textctrl
 			m_dataAfter->SetValue(m_mainFrame->GetProcessedPDFPageText(currentPage));
+			// set widget background colour based on if this page was processed successfully or not
+			if (m_mainFrame->GetIsPDFPageRekt(currentPage))
+			{
+				// page is rekt, set colour to red
+				m_dataAfter->SetBackgroundColour(wxColour(220, 180, 180));
+			}
+			else
+			{
+				// page is good! set colour to white
+				m_dataAfter->SetBackgroundColour(wxColour(255, 255, 255));
+			}
 		}
 		m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", currentPage));
 	}

@@ -79,6 +79,10 @@ bool MyApp::OnInit()
                 frame->SetSwitchPages(wxString(frame->GetArgumentsParser().GetValue(switchName)));
             }
         }
+        else if (switchName == "template" || switchName == "t")
+        {
+            tempOut += "  Switch set: -" + switchName + " (Template file) " + value + "\n";
+                }
         // template file
         // output file
         // save program log perhaps?

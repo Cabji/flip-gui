@@ -58,7 +58,7 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     // Get filename & path separately
     wxFileName absoluteFilename(target);
 	absoluteFilename.Normalize(wxPATH_UNIX);
-    wxString path = absoluteFilename.GetPath() + "templates";
+    wxString path = absoluteFilename.GetPath();
     wxString filename = absoluteFilename.GetFullName();
 
     // Check path existence & create if required
@@ -82,14 +82,14 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 
     m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
 
-    // Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
+    // Add the new template file's details into m_mainFrame->m_tmap_userTemplates
     m_mainFrame->m_tmap_userTemplates[filename] = target;
 
-    // Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets
-    m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
+    // Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets and get index of position in the wxChoice widget
+    int newIndex = m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
 
     // Select the new template in both wxChoice widgets
-    int newIndex = m_templatesExisting->FindString(filename);
+    //int newIndex = m_templatesExisting->FindString(filename);
     m_templatesExisting->SetSelection(newIndex);
     m_wxChoicePtr_Templates->SetSelection(newIndex);
 

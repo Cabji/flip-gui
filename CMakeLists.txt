@@ -56,15 +56,5 @@ add_custom_command(TARGET copy_resources POST_BUILD
     COMMENT "Copying resource files recursively to the build directory..."
 )
 
-# Assuming you are using MSYS2/MinGW or Visual Studio:
-# if (WIN32)
-#     add_custom_command(TARGET FlipApp POST_BUILD
-#         COMMAND ${CMAKE_COMMAND} -E
-#             env "PATH=$ENV{PATH}"
-#             mt.exe -manifest \"${CMAKE_SOURCE_DIR}/app.manifest\" -outputresource:\"$<TARGET_FILE:FlipApp>\";
-#         COMMENT "Embedding manifest..."
-#     )
-# endif()
-
 # Ensure the resources are copied before building the executable
 add_dependencies(FlipApp copy_resources)

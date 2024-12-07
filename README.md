@@ -39,3 +39,8 @@ Here are some features I'd like to add eventually:
 
 - Automation Support: add command line switches & flip-gui "automation" configuration support for fully automated PDF processing
 - Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers
+
+# Known Bugs
+
+1. Template Editor wxChoice for choosing template file doesn't reflect update in Main Frame's template wxChoice when new template file is added via T.E. (Template Editor)
+2. Possible bug in Data Viewer when reusing it multiple times (need to reproduce and accurately describe) (Data Viewer)

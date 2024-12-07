@@ -26,7 +26,7 @@ public:
 	void OnTemplateEditorTextChanged(wxCommandEvent &event);
 	void OnTemplateListUpdated(wxCommandEvent &event);
 
-	wxChoice *m_wxChoicePtr_Templates; // ptr to parent's wxChoice for templates
+	wxChoice *m_wxChoicePtr_Templates; // ptr to mainFrame's wxChoice for available and currently selected templates
 private:
 	bool
 		m_templateFileWasDeleted = false,

@@ -38,59 +38,68 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 
 void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 {
-	// Get filename info from m_filePickerAddNew
-	wxString target = m_filePickerAddNew->GetTextCtrlValue();
-	if (target.IsEmpty())
-	{
-		// We didn't get anything from the file picker control
-		m_mainFrame->LogMessage("TE::OnBtnAdd: target value was empty");
-		return;
-	}
+    // Get filename info from m_filePickerAddNew
+    wxString target = m_filePickerAddNew->GetTextCtrlValue();
+    if (target.IsEmpty())
+    {
+        // We didn't get anything from the file picker control
+        m_mainFrame->LogMessage("TE::OnBtnAdd: target value was empty");
+        return;
+    }
 
-	// Get filename & path separately
-	wxFileName absoluteFilename(target);
-	wxString path = absoluteFilename.GetPath();
-	wxString filename = absoluteFilename.GetFullName();
+    // Create a wxFileName object from the target string to check if it's an absolute path
+    wxFileName fileName(target);
+    if (!fileName.IsAbsolute())
+    {
+        // Prepend the default template path if it's just a filename
+        target = m_mainFrame->FLIP_DEFAULT_TEMPLATE_PATH + "/" + target;
+    }
 
-	// Check path existence & create if required
-	if (!wxDirExists(path) && !path.IsEmpty())
-	{
-		if (!wxFileName::Mkdir(path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
-		{
-			m_mainFrame->LogMessage("TE::OnBtnAdd: Could not create directory for new template file: " + target);
-			return;
-		}
-		m_mainFrame->LogMessage("TE::OnBtnAdd: Created directory: " + path + " for new template creation.");
-	}
+    // Get filename & path separately
+    wxFileName absoluteFilename(target);
+	absoluteFilename.Normalize(wxPATH_UNIX);
+    wxString path = absoluteFilename.GetPath() + "templates";
+    wxString filename = absoluteFilename.GetFullName();
 
-	// Create new template file
-	wxFileOutputStream wxfs_Target(target);
-	if (!wxfs_Target.IsOk())
-	{
-		m_mainFrame->LogMessage("TE::OnBtnAdd: Creation of new template file failed");
-		return;
-	}
+    // Check path existence & create if required
+    if (!wxDirExists(path) && !path.IsEmpty())
+    {
+        if (!wxFileName::Mkdir(path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
+        {
+            m_mainFrame->LogMessage("TE::OnBtnAdd: Could not create directory for new template file: " + target);
+            return;
+        }
+        m_mainFrame->LogMessage("TE::OnBtnAdd: Created directory: " + path + " for new template creation.");
+    }
 
-	m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
+    // Create new template file
+    wxFileOutputStream wxfs_Target(target);
+    if (!wxfs_Target.IsOk())
+    {
+        m_mainFrame->LogMessage("TE::OnBtnAdd: Creation of new template file failed");
+        return;
+    }
 
-	// Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
-	m_mainFrame->m_tmap_userTemplates[filename] = target;
+    m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
 
-	// Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets
-	m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
+    // Add the new template file's details into m_wxChoice_templates and m_mainFrame->m_tmap_userTemplates
+    m_mainFrame->m_tmap_userTemplates[filename] = target;
 
-	// Select the new template in both wxChoice widgets
-	int newIndex = m_templatesExisting->FindString(filename);
-	m_templatesExisting->SetSelection(newIndex);
-	m_wxChoicePtr_Templates->SetSelection(newIndex);
+    // Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets
+    m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
 
-	// Trigger the event handler to load the new file into the template editor
-	wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
-	choiceEvent.SetInt(newIndex);
-	OnTemplateChoiceChanged(choiceEvent);
+    // Select the new template in both wxChoice widgets
+    int newIndex = m_templatesExisting->FindString(filename);
+    m_templatesExisting->SetSelection(newIndex);
+    m_wxChoicePtr_Templates->SetSelection(newIndex);
 
-	m_mainFrame->LogMessage("New template added, and editor updated.");
-	m_templateEditorStatusBar->SetStatusText("New template created at " + target);
+    // Trigger the event handler to load the new file into the template editor
+    wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
+    choiceEvent.SetInt(newIndex);
+    OnTemplateChoiceChanged(choiceEvent);
+
+    m_mainFrame->LogMessage("New template added, and editor updated.");
+    m_templateEditorStatusBar->SetStatusText("New template created at " + target);
 }
 
 void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)

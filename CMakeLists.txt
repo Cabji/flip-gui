@@ -3,7 +3,7 @@ project(FlipApp)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(wxWidgets_ROOT_DIR "c:/cpp/cppLibraries/wxWidgets_static")
+set(wxWidgets_ROOT_DIR "c:/cpp/include/wxWidgets-3.2.6-static")
 set(wxWidgets_LIB_DIR "${wxWidgets_ROOT_DIR}/lib/gcc_x64_lib")
 set(wxWidgets_CONFIGURATION "mswu")
 set(wxWidgets_INCLUDE_DIRS 
@@ -15,8 +15,8 @@ set(CMAKE_CXX_FLAGS "-mwindows")
 
 find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
 # Link against Poppler libraries
-find_library(POPPLER_LIB poppler REQUIRED HINTS "C:/cpp/msys64/ucrt64/lib")
-find_library(POPPLER_CPP_LIB poppler-cpp REQUIRED HINTS "C:/cpp/msys64/ucrt64/lib")
+find_library(POPPLER_LIB poppler REQUIRED HINTS "C:/msys64/ucrt64/lib")
+find_library(POPPLER_CPP_LIB poppler-cpp REQUIRED HINTS "C:/msys64/ucrt64/lib")
 
 include(${wxWidgets_USE_FILE})
 
@@ -29,7 +29,7 @@ add_executable(FlipApp
     FlipTemplateEditor.cpp
     cabjiFunctions.cpp
     include/StartupArgumentsParser.cpp
-    app.manifest  
+    main.exe.manifest  
 )
 
 target_include_directories(FlipApp PRIVATE ${wxWidgets_INCLUDE_DIRS})
@@ -57,14 +57,14 @@ add_custom_command(TARGET copy_resources POST_BUILD
 )
 
 # Assuming you are using MSYS2/MinGW or Visual Studio:
-if (WIN32)
-    add_custom_command(TARGET FlipApp POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E
-            env "PATH=$ENV{PATH}"
-            mt.exe -manifest \"${CMAKE_SOURCE_DIR}/app.manifest\" -outputresource:\"$<TARGET_FILE:FlipApp>\";
-        COMMENT "Embedding manifest..."
-    )
-endif()
+# if (WIN32)
+#     add_custom_command(TARGET FlipApp POST_BUILD
+#         COMMAND ${CMAKE_COMMAND} -E
+#             env "PATH=$ENV{PATH}"
+#             mt.exe -manifest \"${CMAKE_SOURCE_DIR}/app.manifest\" -outputresource:\"$<TARGET_FILE:FlipApp>\";
+#         COMMENT "Embedding manifest..."
+#     )
+# endif()
 
 # Ensure the resources are copied before building the executable
 add_dependencies(FlipApp copy_resources)

@@ -75,6 +75,7 @@ public:
 	TemplateMap m_tmap_userTemplates;
 
 protected:
+	// pointers to core program window objects
 	std::unique_ptr<FlipProgramLog> m_programLog;
 	std::unique_ptr<FlipTemplateEditor> m_templateEditor;
 	std::unique_ptr<FlipDataViewer> m_dataViewer;

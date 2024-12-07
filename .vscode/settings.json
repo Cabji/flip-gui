@@ -1,5 +1,5 @@
 {
-    "cmake.generator": "MinGW Makefiles",
+    "cmake.generator": "Unix Makefiles",
     "files.associations": {
         "*.kvs": "cpp",
         "iostream": "cpp",

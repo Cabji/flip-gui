@@ -12,7 +12,7 @@
             "environment": [],        // Add any environment variables if needed
             "externalConsole": true,  // Show an external console window
             "MIMode": "gdb",          // Specify GDB as the debugger
-            "miDebuggerPath": "C:/cpp/msys64/ucrt64/bin/gdb.exe",  // Path to the GDB executable
+            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",  // Path to the GDB executable
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

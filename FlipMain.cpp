@@ -74,11 +74,12 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     // example of static call to LogMessage:
     // FlipProgramLog::LogMessage("This is a test.", *m_programLog);
 
-    m_configTemplateDirs.Add(FLIP_DEFAULT_CONFIG_PATH);
+    // dev-note: we don't use . (current dir, or same dir as the .exe file) as a valid place for templates because during development this will populate the template wxChoice's with a load of development files.
+    m_configTemplateDirs.Add(FLIP_DEFAULT_TEMPLATE_PATH);
     m_configTemplateDirs.Add("./templates");
-
+  
     // load available templates into wxChoice widgets
-    LogMessage("Looking for existing template files in user's home/.flip/templates and ./templates");
+    LogMessage("Looking for existing template files in user's home/.flip/templates, and ./templates");
     m_tmap_userTemplates = ReadUserTemplates();
     // dev-note: UpdateTemplateChoices *should* invoke an update in FlipTemplateEditor::wxChoice widget as well
     UpdateTemplateChoices();

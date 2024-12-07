@@ -5,9 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include", 
-                "C:/cpp/cppLibraries/wxWidgets_static/lib/gcc_x64_lib/mswu",
-                "C:/cpp/cppLibraries/wxWidgets_static/include", 
-                "C:/cpp/cppLibraries/poppler-24.02.0/Library/include/poppler"
+                "C:/cpp/include/wxWidgets-3.2.6-static/lib/gcc_x64_lib/mswud",
+                "C:/cpp/include/wxWidgets-3.2.6-static/include", 
+                "C:/msys64/ucrt64/include/poppler"
             ],
             "defines": [
                 "_WINDOWS",
@@ -16,11 +16,11 @@
                 "NDEBUG",
                 "NOPCH"
             ],
-            "compilerPath": "c:/cpp/msys64/ucrt64/bin/g++.exe",
+            "compilerPath": "c:/msys64/ucrt64/bin/g++.exe",
             "cStandard": "c11",
             "cppStandard": "c++20",
-            "intelliSenseMode": "gcc-x86",
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "intelliSenseMode": "gcc-x86"
+            // "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {
             "name": "Mac",

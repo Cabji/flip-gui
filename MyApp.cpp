@@ -51,9 +51,12 @@ bool MyApp::OnInit()
             tempOut += "Flip - process PDF file to extract data\n\nUsage: " + binaryFilename + " [--switch] [value]\n\n";
             tempOut += "\tSwitch Name\t\tValue\n";
             tempOut += "\t--------------------------------------------------------------------------------\n";
-            tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
+            tempOut += "\tconsole\t\t\tOutput program messages to console\n";
             tempOut += "\tdbp\t\t\tShow data before regex processing (stepped processing)\n";
+            tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
+            tempOut += "\tpage\t\t\tPage range to use (eg: 1-4 or 2,4,7,12)\n";
             tempOut += "\tsws\t\t\tStrip excessive whitspace from input data\n";
+            tempOut += "\ttemplate\t\tAbsolute or relative path to template filename\n";
         }
         else if (switchName == "input" || switchName == "if" || switchName == "inputfile")
         {
@@ -82,7 +85,7 @@ bool MyApp::OnInit()
         else if (switchName == "template" || switchName == "t")
         {
             tempOut += "  Switch set: -" + switchName + " (Template file) " + value + "\n";
-                }
+        }
         // template file
         // output file
         // save program log perhaps?

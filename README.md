@@ -42,5 +42,6 @@ Here are some features I'd like to add eventually:
 
 # Known Bugs
 
-1. Template Editor wxChoice for choosing template file doesn't reflect update in Main Frame's template wxChoice when new template file is added via T.E. (Template Editor)
-2. Possible bug in Data Viewer when reusing it multiple times (need to reproduce and accurately describe) (Data Viewer)
+1. ~~Template Editor wxChoice for choosing template file doesn't reflect update in Main Frame's template wxChoice when new template file is added via T.E. (Template Editor)~~
+2. Template Editor doesn't auto select newly created template in wxChoice widget, nor open it in text editing widget ready for editing.
+3. Possible bug in Data Viewer when reusing it multiple times (need to reproduce and accurately describe) (Data Viewer)

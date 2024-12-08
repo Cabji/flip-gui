@@ -93,10 +93,13 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     m_templatesExisting->SetSelection(newIndex);
     m_wxChoicePtr_Templates->SetSelection(newIndex);
 
-    // Trigger the event handler to load the new file into the template editor
-    wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
-    choiceEvent.SetInt(newIndex);
-    OnTemplateChoiceChanged(choiceEvent);
+    // Trigger an event handler to load the new file into the template editor
+    // wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
+    // choiceEvent.SetInt(newIndex);
+    // OnTemplateChoiceChanged(choiceEvent);
+
+	m_mainFrame->m_tmap_userTemplates = m_mainFrame->ReadUserTemplates();
+	m_mainFrame->UpdateTemplateChoices();
 
     m_mainFrame->LogMessage("New template added, and editor updated.");
     m_templateEditorStatusBar->SetStatusText("New template created at " + target);

@@ -83,7 +83,9 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     m_mainFrame->LogMessage("Template Editor created a new file at: " + target);
 
     // Add the new template file's details into m_mainFrame->m_tmap_userTemplates
-    m_mainFrame->m_tmap_userTemplates[filename] = target;
+	m_mainFrame->m_tmap_userTemplates = m_mainFrame->ReadUserTemplates();
+	m_mainFrame->m_tmap_userTemplates[filename] = target;
+	m_mainFrame->UpdateTemplateChoices();
 
     // Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets and get index of position in the wxChoice widget
     int newIndex = m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
@@ -91,15 +93,12 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     // Select the new template in both wxChoice widgets
     //int newIndex = m_templatesExisting->FindString(filename);
     m_templatesExisting->SetSelection(newIndex);
-    m_wxChoicePtr_Templates->SetSelection(newIndex);
+	m_mainFrame->LogMessage("Index found for new template was: " + wxString::FromUTF8(std::to_string(newIndex)));
 
     // Trigger an event handler to load the new file into the template editor
     // wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
     // choiceEvent.SetInt(newIndex);
     // OnTemplateChoiceChanged(choiceEvent);
-
-	m_mainFrame->m_tmap_userTemplates = m_mainFrame->ReadUserTemplates();
-	m_mainFrame->UpdateTemplateChoices();
 
     m_mainFrame->LogMessage("New template added, and editor updated.");
     m_templateEditorStatusBar->SetStatusText("New template created at " + target);

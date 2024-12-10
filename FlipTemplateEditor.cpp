@@ -91,14 +91,16 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     int newIndex = m_wxChoicePtr_Templates->Append(filename); // For main frame wxChoice
 
     // Select the new template in both wxChoice widgets
-    //int newIndex = m_templatesExisting->FindString(filename);
     m_templatesExisting->SetSelection(newIndex);
 	m_mainFrame->LogMessage("Index found for new template was: " + wxString::FromUTF8(std::to_string(newIndex)));
 
-    // Trigger an event handler to load the new file into the template editor
-    // wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
-    // choiceEvent.SetInt(newIndex);
-    // OnTemplateChoiceChanged(choiceEvent);
+	// load the new template file into the template editor using OnTemplateChoiceChanged
+	// dev-note: using the wxChoice event here makes the auto-save events work when the new template content is changed.
+	wxCommandEvent choiceEvent(wxEVT_CHOICE, m_templatesExisting->GetId());
+	wxPostEvent(m_templatesExisting, choiceEvent);
+
+	// give m_templateEditor keyboard focus
+	m_templateEditor->SetFocus();
 
     m_mainFrame->LogMessage("New template added, and editor updated.");
     m_templateEditorStatusBar->SetStatusText("New template created at " + target);
@@ -306,6 +308,8 @@ void FlipTemplateEditor::OnTemplateEditorTextChanged(wxCommandEvent &event)
 {
 	if (m_templateFileWasDeleted || m_templateFileWasLoaded || m_templatesExisting->GetSelection() == wxNOT_FOUND)
 	{
+		m_templateFileWasDeleted = false;
+		m_templateFileWasLoaded = false;
 		return;
 	}
 	m_templateEditorStatusBar->SetStatusText("Template content modified");

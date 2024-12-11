@@ -18,6 +18,7 @@ public:
 	/** Constructor */
 	FlipTemplateEditor(FlipMain *parent);
 	//// end generated class members
+	void OnFilePickerTextCtrlFocus(wxEvent &event);
 	void OnBtnAddTemplate(wxCommandEvent &event);
 	void OnBtnRemoveTemplate(wxCommandEvent &event);
 	void OnClose(wxCloseEvent &event);

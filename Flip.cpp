@@ -194,7 +194,7 @@ TemplateEditor::TemplateEditor( wxWindow* parent, wxWindowID id, const wxString&
 	m_templateEditorSizer->Add( m_btnAddTemplate, wxGBPosition( 0, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 
 	wxArrayString m_templatesExistingChoices;
-	m_templatesExisting = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_templatesExistingChoices, 0 );
+	m_templatesExisting = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_templatesExistingChoices, wxCB_SORT );
 	m_templatesExisting->SetSelection( 0 );
 	m_templatesExisting->SetToolTip( _("Select an existing template to load it into the editor below") );
 

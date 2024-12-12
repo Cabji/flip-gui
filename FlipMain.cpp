@@ -838,6 +838,7 @@ void FlipMain::OnUseTemplateChoice(wxCommandEvent &event)
 
     if (selection != wxNOT_FOUND)
     {
+        // update the tooltip for the template wxChoice widget
         choice->SetToolTip(m_tmap_userTemplates[choice->GetStringSelection()]);
         LogMessage("User selected template: " + choice->GetStringSelection() + " (Full path: " + m_tmap_userTemplates[choice->GetStringSelection()] + ")");
     }

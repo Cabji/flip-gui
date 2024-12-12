@@ -40,7 +40,6 @@ FlipTemplateEditor::FlipTemplateEditor(FlipMain *parent)
 
 void FlipTemplateEditor::OnFilePickerTextCtrlFocus(wxEvent &event)
 {
-	m_mainFrame->LogMessage("TextCtrlFocus handler ran");
     // Select all text when the user clicks into the wxTextCtrl
 	// Access the wxTextCtrl inside the wxFilePickerCtrl
     wxTextCtrl* textCtrl = m_filePickerAddNew->GetTextCtrl();
@@ -49,17 +48,10 @@ void FlipTemplateEditor::OnFilePickerTextCtrlFocus(wxEvent &event)
 		textCtrl->SetFocus();
         // Select all text inside the wxTextCtrl
         textCtrl->SetSelection(-1, -1);
-		m_mainFrame->LogMessage("we selected all!");
     }
 
     event.Skip();
 }
-
-// void FlipTemplateEditor::OnFilePickerTextCtrlFocus(wxFocusEvent &event)
-// {
-//     m_templateEditor->SelectAll();
-//     event.Skip();
-// }
 
 void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
 {
@@ -83,7 +75,7 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
     // Get filename & path separately
 	// wxFileName created from 'target' var
     wxFileName absoluteTarget(target);
-	absoluteTarget.Normalize(wxPATH_UNIX);
+	absoluteTarget.Normalize(wxPATH_NATIVE);
 	wxString oAbsoluteFilename = absoluteTarget.GetFullPath();
     wxString oPath = absoluteTarget.GetPath();
     wxString oFilename = absoluteTarget.GetFullName();
@@ -106,17 +98,14 @@ void FlipTemplateEditor::OnBtnAddTemplate(wxCommandEvent &event)
         m_mainFrame->LogMessage("TE::OnBtnAdd: Creation of new template file failed");
         return;
     }
-
     m_mainFrame->LogMessage("Template Editor created a new file at: " + oAbsoluteFilename);
 
-    // Add the new template file's details into m_mainFrame->m_tmap_userTemplates
+    // Build TemplateMap m_mainFrame->m_tmap_userTemplates by reading available template files on disk
 	m_mainFrame->m_tmap_userTemplates = m_mainFrame->ReadUserTemplates();
-	m_mainFrame->m_tmap_userTemplates[oFilename] = target;
+	// Update the wxChoice widget in m_mainFrame (this also updates the wxChoice widget in the T.E.)
 	m_mainFrame->UpdateTemplateChoices();
-
-    // Update m_wxChoicePtr_Templates (FlipMain::wxChoice) widgets and get index of position in the wxChoice widget
-    int newIndex = m_wxChoicePtr_Templates->Append(oFilename); // For main frame wxChoice
-
+	// find the index location of the newly added template file in m_templatesExisting
+	auto newIndex = m_templatesExisting->FindString(oFilename, true);
     // Select the new template in both wxChoice widgets
     m_templatesExisting->SetSelection(newIndex);
 	m_mainFrame->LogMessage("Index found for new template was: " + wxString::FromUTF8(std::to_string(newIndex)));
@@ -145,10 +134,10 @@ void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)
 
 	// Get the selected template name and path
 	wxString selectedTemplateRelativeFilename = m_templatesExisting->GetString(selectionIndex);
-	wxString selectedTemplateabsoluteTarget = m_mainFrame->m_tmap_userTemplates[selectedTemplateRelativeFilename];
+	wxString selectedTemplateAbsoluteTarget = m_mainFrame->m_tmap_userTemplates[selectedTemplateRelativeFilename];
 
 	// Ask the user for confirmation before deleting the file
-	wxString confirmationMessage = wxString::Format("Are you sure you want to permanently delete the template '%s'?\nThis action cannot be undone.", selectedTemplateabsoluteTarget);
+	wxString confirmationMessage = wxString::Format("Are you sure you want to permanently delete the template '%s'?\nThis action cannot be undone.", selectedTemplateAbsoluteTarget);
 	int response = wxMessageBox(confirmationMessage, "Confirm Deletion", wxOK | wxCANCEL | wxICON_WARNING);
 
 	if (response != wxOK)
@@ -158,7 +147,7 @@ void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)
 	}
 
 	// Attempt to delete the file
-	if (wxRemoveFile(selectedTemplateabsoluteTarget))
+	if (wxRemoveFile(selectedTemplateAbsoluteTarget))
 	{
 		// Remove the deleted template from the map, update the wxChoice widget, clear the template editor textCtrl
 		// m_mainFrame->m_tmap_userTemplates.erase(selectedTemplateRelativeFilename);
@@ -168,7 +157,7 @@ void FlipTemplateEditor::OnBtnRemoveTemplate(wxCommandEvent &event)
 		m_templateEditor->Clear();
 		m_templateFileWasDeleted = true;
 		// update status bar to show successful deletion
-		m_templateEditorStatusBar->SetStatusText("Template file " + selectedTemplateabsoluteTarget + " deleted");
+		m_templateEditorStatusBar->SetStatusText("Template file " + selectedTemplateAbsoluteTarget + " deleted");
 		m_mainFrame->UpdateTemplateChoices();
 	}
 	else
@@ -232,8 +221,7 @@ void FlipTemplateEditor::OnTemplateChoiceChanged(wxCommandEvent &event)
 		templateContents.RemoveLast();
 	}
 
-	m_mainFrame->LogMessage("Well it seems like the template file was read into wxString templateContents");
-	m_mainFrame->LogMessage("templateContents:\n\n" + templateContents);
+	m_mainFrame->LogMessage("Template Contents:\n\n" + templateContents);
 	// Set the loaded content into m_templateEditor
 	m_templateEditor->SetValue(templateContents);
 	m_templateFileWasLoaded = true;
@@ -358,8 +346,8 @@ void FlipTemplateEditor::OnTemplateListUpdated(wxCommandEvent &event)
 	m_mainFrame->LogMessage("\tFlipTemplateEditor::m_templatesExisting wxChoices widget updated");
 	// Update m_existingTemplates to reflect the current state of m_useTemplate in FlipMain
 	m_templatesExisting->Clear();
-	for (size_t i = 0; i < m_wxChoicePtr_Templates->GetCount(); ++i)
+	for (auto pair : m_mainFrame->m_tmap_userTemplates)
 	{
-		m_templatesExisting->Append(m_wxChoicePtr_Templates->GetString(i));
+		m_templatesExisting->Append(pair.first);
 	}
 }

@@ -85,6 +85,19 @@ bool MyApp::OnInit()
         else if (switchName == "template" || switchName == "t")
         {
             tempOut += "  Switch set: -" + switchName + " (Template file) " + value + "\n";
+            auto templateIndex = frame->m_useTemplate->FindString(value, true);
+            if (templateIndex != wxNOT_FOUND)
+            {
+                frame->m_useTemplate->SetSelection(templateIndex);
+                // if ()
+                // {
+                //     tempOut += "    Template: '" + value + "' was successfully selected in the UI" + "\n";
+                // }
+                // else
+                // {
+                //     tempOut += "    WARNING! Template '" + value + "' was NOT found!" + "\n";
+                // }
+            }
         }
         // template file
         // output file

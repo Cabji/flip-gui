@@ -71,10 +71,9 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
     m_useTemplate->Bind(wxEVT_CHOICE, &FlipMain::OnUseTemplateChoice, this);
     m_switchDBP->Bind(wxEVT_CHECKBOX, &FlipMain::OnSwitchDBPChecked, this);
 
-    // example of static call to LogMessage:
-    // FlipProgramLog::LogMessage("This is a test.", *m_programLog);
-
-    // dev-note: we don't use . (current dir, or same dir as the .exe file) as a valid place for templates because during development this will populate the template wxChoice's with a load of development files.
+    // dev-note: we don't use . (current dir, or same dir as the .exe file) as a valid place 
+    // for templates because during development this will populate the template wxChoice's with \
+    // a load of development files.
     m_configTemplateDirs.Add(FLIP_DEFAULT_TEMPLATE_PATH);
     m_configTemplateDirs.Add("./templates");
   

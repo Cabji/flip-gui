@@ -57,6 +57,7 @@ public:
 	void SetUseConsoleOutput(const bool v);
 	bool SetInputFilename(const wxString &filename);
 	bool SetOutputFilename(const wxString &filename);
+	bool SetSwitchAutoLAUNCH();
 	bool SetSwitchDBP();
 	bool SetSwitchSWS();
 	bool SetSwitchPages(const wxString &value);
@@ -101,7 +102,9 @@ private:
 	void SetupMenuIcons(wxMenu *menu);
 
 	// private members
+	RegexSubstitutionList m_regexList;
 	StartupArgumentsParser m_startupArguments;
+	bool m_doAutoLAUNCH = false;
 	bool m_useConsoleOutput = false;
 	int m_currentRegex = 0;
 	std::vector<int> m_vec_pdfDataRektPages;
@@ -110,7 +113,6 @@ private:
 	wxArrayString m_configTemplateDirs;
 	wxString m_tempOutput;
 	wxTimer m_filePollTimer;
-	RegexSubstitutionList m_regexList;
 };
 
 #endif // __FlipMain__

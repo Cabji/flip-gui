@@ -885,6 +885,12 @@ bool FlipMain::SetOutputFilename(const wxString &filename)
     return true;
 }
 
+bool FlipMain::SetSwitchAutoLAUNCH()
+{
+    m_doAutoLAUNCH = true;
+    return true;
+}
+
 bool FlipMain::SetSwitchDBP()
 {
     m_switchDBP->SetValue(true);

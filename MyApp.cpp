@@ -51,12 +51,13 @@ bool MyApp::OnInit()
             tempOut += "Flip - process PDF file to extract data\n\nUsage: " + binaryFilename + " [--switch] [value]\n\n";
             tempOut += "\tSwitch Name\t\tValue\n";
             tempOut += "\t--------------------------------------------------------------------------------\n";
+            tempOut += "\tauto\t\t\tN/A (Automatic LAUNCH)\n";
             tempOut += "\tconsole\t\t\tOutput program messages to console\n";
-            tempOut += "\tdbp\t\t\tShow data before regex processing (stepped processing)\n";
+            tempOut += "\tdbp\t\t\tN/A (Show data before regex processing/stepped processing)\n";
             tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
             tempOut += "\toutput\t\t\tAbsolute or relative path to output filename\n";
             tempOut += "\tpage\t\t\tPage range to use (eg: 1-4 or 2,4,7,12)\n";
-            tempOut += "\tsws\t\t\tStrip excessive whitspace from input data\n";
+            tempOut += "\tsws\t\t\tN/A (Strip excessive whitspace from input data)\n";
             tempOut += "\ttemplate\t\tAbsolute or relative path to template filename\n";
         }
         else if (switchName == "input" || switchName == "i" || switchName == "if" || switchName == "inputfile")
@@ -102,7 +103,13 @@ bool MyApp::OnInit()
             frame->SetOutputFilename(wxString(value));
             tempOut += "  Output file set to: " + value + "\n";
         }
-        // auto LAUNCH
+        else if (switchName == "auto" || switchName == "launch" || switchName == "autolaunch" || switchName == "al")
+        {
+            tempOut += "  Switch set: -" + switchName + " (Automatic LAUNCH of processing)\n";
+            // invoke auto LAUNCH somehow
+            frame->SetSwitchAutoLAUNCH();
+        }
+        // full automated (does all processing and output to file without any user interaction)
         // save program log perhaps?
         // a switch to confirm automated processing (as opposed to just setting all the values and waiting for the LAUNCH button to be clicked in the GUI)
     }

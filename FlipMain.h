@@ -56,6 +56,7 @@ public:
 	TemplateMap ReadUserTemplates();
 	void SetUseConsoleOutput(const bool v);
 	bool SetInputFilename(const wxString &filename);
+	bool SetOutputFilename(const wxString &filename);
 	bool SetSwitchDBP();
 	bool SetSwitchSWS();
 	bool SetSwitchPages(const wxString &value);

@@ -54,11 +54,12 @@ bool MyApp::OnInit()
             tempOut += "\tconsole\t\t\tOutput program messages to console\n";
             tempOut += "\tdbp\t\t\tShow data before regex processing (stepped processing)\n";
             tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
+            tempOut += "\toutput\t\t\tAbsolute or relative path to output filename\n";
             tempOut += "\tpage\t\t\tPage range to use (eg: 1-4 or 2,4,7,12)\n";
             tempOut += "\tsws\t\t\tStrip excessive whitspace from input data\n";
             tempOut += "\ttemplate\t\tAbsolute or relative path to template filename\n";
         }
-        else if (switchName == "input" || switchName == "if" || switchName == "inputfile")
+        else if (switchName == "input" || switchName == "i" || switchName == "if" || switchName == "inputfile")
         {
             frame->SetInputFilename(wxString(value));
             tempOut += "  Input file set to: " + value + "\n";
@@ -89,18 +90,19 @@ bool MyApp::OnInit()
             if (templateIndex != wxNOT_FOUND)
             {
                 frame->m_useTemplate->SetSelection(templateIndex);
-                // if ()
-                // {
-                //     tempOut += "    Template: '" + value + "' was successfully selected in the UI" + "\n";
-                // }
-                // else
-                // {
-                //     tempOut += "    WARNING! Template '" + value + "' was NOT found!" + "\n";
-                // }
+                tempOut += "    Template: '" + value + "' was successfully selected in the UI" + "\n";
+            }
+            else
+            {
+                tempOut += "    WARNING! Template '" + value + "' was NOT found!" + "\n";
             }
         }
-        // template file
-        // output file
+        else if (switchName == "output" || switchName == "o" || switchName == "of" || switchName == "outputfile")
+        {
+            frame->SetOutputFilename(wxString(value));
+            tempOut += "  Output file set to: " + value + "\n";
+        }
+        // auto LAUNCH
         // save program log perhaps?
         // a switch to confirm automated processing (as opposed to just setting all the values and waiting for the LAUNCH button to be clicked in the GUI)
     }

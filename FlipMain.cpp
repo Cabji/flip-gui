@@ -879,6 +879,12 @@ bool FlipMain::SetInputFilename(const wxString &filename)
     return true;
 }
 
+bool FlipMain::SetOutputFilename(const wxString &filename)
+{
+    m_outputFile->SetPath(filename);
+    return true;
+}
+
 bool FlipMain::SetSwitchDBP()
 {
     m_switchDBP->SetValue(true);

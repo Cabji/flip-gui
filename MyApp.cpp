@@ -115,7 +115,8 @@ bool MyApp::OnInit()
     }
 
     std::cout << tempOut << std::endl;
-
     frame->Show(true);
+    frame->DoAutoLAUNCH();
+    
     return true;
 }

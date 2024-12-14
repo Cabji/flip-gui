@@ -98,6 +98,20 @@ FlipMain::~FlipMain()
     Unbind(wxEVT_TIMER, &FlipMain::OnTemplateFilePoll, this);
 }
 
+bool FlipMain::DoAutoLAUNCH()
+{
+    if (m_doAutoLAUNCH)
+    {
+        LogMessage("Automatic data processing was launched");
+        // OnBtnLaunch() should verify reqd data is ready for us
+        // trigger event for OnBtnLaunch()
+        wxCommandEvent buttonEvent(wxEVT_BUTTON, m_btnLaunch->GetId());
+        wxPostEvent(m_btnLaunch, buttonEvent);
+        return true;
+    }
+    return false;
+}
+
 StartupArgumentsParser &FlipMain::GetArgumentsParser()
 {
     // return the m_startupArguments _instance_
@@ -887,6 +901,7 @@ bool FlipMain::SetOutputFilename(const wxString &filename)
 
 bool FlipMain::SetSwitchAutoLAUNCH()
 {
+    LogMessage("we are in SetSwitchAutoLAUNCH");
     m_doAutoLAUNCH = true;
     return true;
 }

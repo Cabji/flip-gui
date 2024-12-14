@@ -39,9 +39,10 @@ public:
 	/** Constructor */
 	FlipMain(wxWindow *parent);
 	//// end generated class members
-	// cutom constructor declared below here
+	// cstom constructor declared below here
 	FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 	~FlipMain();
+	bool DoAutoLAUNCH();
 	StartupArgumentsParser &GetArgumentsParser();
 	wxString GetPDFPageText(const int pageNum);
 	wxString GetProcessedPDFPageText(const int pageNum);

@@ -147,12 +147,12 @@ void FlipDataViewer::OnSpin(wxEvent &event)
 				m_dataAfter->SetBackgroundColour(wxColour(255, 255, 255));
 			}
 		}
-		m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", currentPage));
+		// m_mainFrame->LogMessage("Spin Event occurred. SpinButton Value: " + wxString::Format("%i", currentPage));
 	}
 	else
 	{
 		// prevent spin value from exceeding the maximum number of pages
 		m_spinPages->SetValue(m_spinPages->GetValue() - 1);
-		m_mainFrame->LogMessage("Spin value maximum reached.");
+		// m_mainFrame->LogMessage("Spin value maximum reached.");
 	}
 }

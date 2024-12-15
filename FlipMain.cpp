@@ -423,8 +423,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     }
 
     // At this point, all validations passed, and we can proceed with core processing
-    // wxMessageBox("Validation successful. Starting core processing...", "Success", wxOK | wxICON_INFORMATION);
-    // reset m_temOutput as we dont need to show any messages to the user for this current undertaking
+    // reset m_tempOutput as we dont need to show any messages to the user for this current undertaking
     m_tempOutput = wxEmptyString;
 
     // *************** Start Core Functionality - Read and Parse PDF Data ***************
@@ -476,7 +475,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
             // switch: -dbp (show data before processing)
             if (m_switchDBP->GetValue())
             {
-                LogMessage("Data Before Processing - Page " + wxString::Format(wxT("%i"), i) + "\n" + pageText);
+                LogMessage("Data Before Processing - Page " + wxString::Format(wxT("%i"), i) + "\n" + pageText + "\n");
             }
 
             m_vec_pdfData.push_back(pageText);
@@ -491,12 +490,14 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // temporary output message:
     LogMessage("Processed " + wxString::Format(wxT("%i"), pagesProcessed) + " pages from the input file.");
 
-    // at this point we need to know if -dbp switch is true.
-    // if m_switchDBP->GetValue() == false means we can continue processing immediately
-    // otherwise, process continuation is handed over to FlipDataViewer and we wait for button click from there.
+    // at this point we need to know if -dbp switch is true, or if m_doAutoLAUNCH is true.
+    // if m_switchDBP->GetValue() == false or m_doAutoLAUNCH == true, we can continue 
+    // processing immediately.
+    // otherwise, process continuation is handed over to the user via the FlipDataViewer window 
+    // and we wait for button click from there.
 
     wxCommandEvent tripEvent(EVT_FLIPMAIN_LAUNCH_CLICKED);
-    if (!m_switchDBP->GetValue())
+    if (!m_switchDBP->GetValue() || m_doAutoLAUNCH)
     {
         OnFlipDataViewerBtnFinishProcessing(tripEvent);
         // trigger event so that FlipDataViewer object knows the LAUNCH button was clicked
@@ -506,8 +507,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     {
         wxPostEvent(m_dataViewer.get(), tripEvent);
     }
-    // if FlipMain::LAUNCH was pressed, make the dataViewer frame show()
-    m_dataViewer->Show();
+    // if FlipMain::LAUNCH btn was clicked and m_doAutoLAUNCH == false, make the dataViewer frame show()
+    if (!m_doAutoLAUNCH)
+    {
+        m_dataViewer->Show();
+    }
 }
 
 void FlipMain::OnFlipDataViewerBtnContinueProcessing(wxCommandEvent &event)
@@ -662,6 +666,12 @@ void FlipMain::OnFlipDataViewerBtnFinishProcessing(wxCommandEvent &event)
     m_dataViewer->ToggleBtnSaveAbility();
 
     LogMessage("Regex processing completed.");
+
+    if (m_doAutoLAUNCH)
+    {
+        wxCommandEvent tripEvent;
+        OnFlipDataViewerBtnSave(tripEvent);
+    }
 }
 
 void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)

@@ -103,20 +103,19 @@ bool MyApp::OnInit()
             frame->SetOutputFilename(wxString(value));
             tempOut += "  Output file set to: " + value + "\n";
         }
-        else if (switchName == "auto" || switchName == "launch" || switchName == "autolaunch" || switchName == "al")
+        else if (switchName == "auto" || switchName == "automated" || switchName == "launch" || switchName == "autolaunch" || switchName == "al")
         {
             tempOut += "  Switch set: -" + switchName + " (Automatic LAUNCH of processing)\n";
-            // invoke auto LAUNCH somehow
             frame->SetSwitchAutoLAUNCH();
+            // dev-note: if we set the switch for automated LAUNCH, we also must call frame->DoAutoLAUNCH(); further down to start the automatic processing
         }
-        // full automated (does all processing and output to file without any user interaction)
         // save program log perhaps?
-        // a switch to confirm automated processing (as opposed to just setting all the values and waiting for the LAUNCH button to be clicked in the GUI)
     }
 
     std::cout << tempOut << std::endl;
     frame->Show(true);
+    // dev-note: automated LAUNCH will only happen if frame->SetSwitchAutoLAUNCH() is called prior to this.
     frame->DoAutoLAUNCH();
-    
+
     return true;
 }

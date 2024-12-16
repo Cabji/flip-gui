@@ -427,7 +427,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     // If any validation failed, output details on dialog and return early
     if (!success)
     {
-        wxMessageBox("Required values missing. Please check the following and try again: \n\n" + m_tempOutput, "Required information missing", wxOK | wxICON_WARNING);
+        LogMessage("Required values missing. Please check the following and try again: \n\n" + m_tempOutput);
+        if (!m_doQuietMode)
+        {
+            wxMessageBox("Required values missing. Please check the following and try again: \n\n" + m_tempOutput, "Required information missing", wxOK | wxICON_WARNING);
+        }
         m_tempOutput = wxEmptyString;
         return;
     }
@@ -728,7 +732,10 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
         if (!textFile.Open(outFile))
         {
             LogMessage("Failed to open file: " + outFile);
-            wxMessageBox("Failed to open the output file: " + outFile, "Error", wxICON_ERROR);
+            if (!m_doQuietMode)
+            {
+                wxMessageBox("Failed to open the output file: " + outFile, "Error", wxICON_ERROR);
+            }
             return;
         }
         textFile.Clear(); // Clear the content if you're overwriting
@@ -738,7 +745,10 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
         if (!textFile.Create(outFile))
         {
             LogMessage("Failed to create file: " + outFile);
-            wxMessageBox("Failed to create the output file: " + outFile, "Error", wxICON_ERROR);
+            if (!m_doQuietMode)
+            {
+                wxMessageBox("Failed to create the output file: " + outFile, "Error", wxICON_ERROR);
+            }
             return;
         }
     }
@@ -756,7 +766,10 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
     else
     {
         LogMessage("Failed to write data to file: " + outFile);
-        wxMessageBox("Failed to write to the output file: " + outFile, "Error", wxICON_ERROR);
+        if (!m_doQuietMode)
+        {
+            wxMessageBox("Failed to write to the output file: " + outFile, "Error", wxICON_ERROR);
+        }
     }
 
     textFile.Close();

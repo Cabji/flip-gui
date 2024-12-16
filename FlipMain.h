@@ -60,8 +60,9 @@ public:
 	bool SetOutputFilename(const wxString &filename);
 	bool SetSwitchAutoLAUNCH();
 	bool SetSwitchDBP();
-	bool SetSwitchSWS();
 	bool SetSwitchPages(const wxString &value);
+	bool SetSwitchQuiet();
+	bool SetSwitchSWS();
 	bool SetSwitchTemplateFile(const wxString &filename);
 	void UpdateTemplateChoices();
 
@@ -106,6 +107,7 @@ private:
 	RegexSubstitutionList m_regexList;
 	StartupArgumentsParser m_startupArguments;
 	bool m_doAutoLAUNCH = false;
+	bool m_doQuietMode = false;
 	bool m_useConsoleOutput = false;
 	int m_currentRegex = 0;
 	std::vector<int> m_vec_pdfDataRektPages;

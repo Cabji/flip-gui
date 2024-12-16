@@ -100,6 +100,12 @@ FlipMain::~FlipMain()
 
 bool FlipMain::DoAutoLAUNCH()
 {
+    bool result = m_startupArguments.IsSwitchPresent("quiet");
+    wxString str = wxString::Format("%s", result ? "true" : "false");
+    if (result)
+    {
+        LogMessage("Quiet mode (no GUI) is on");
+    }
     if (m_doAutoLAUNCH)
     {
         LogMessage("Automatic data processing was launched");
@@ -165,6 +171,10 @@ bool FlipMain::GetSwitchValue(const wxString &switchName)
     else if (switchName.Lower() == "sws")
     {
         return m_switchSWS->GetValue();
+    }
+    else if (switchName.Lower() == "quiet")
+    {
+        return m_doQuietMode;
     }
     else
     {
@@ -738,7 +748,10 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
     if (textFile.Write())
     {
         LogMessage("Data successfully written to: " + outFile);
-        wxMessageBox("File saved successfully!", "Success", wxICON_INFORMATION);
+        if (!m_doQuietMode)
+        {
+            wxMessageBox("File saved successfully!", "Success", wxICON_INFORMATION);
+        }
     }
     else
     {
@@ -747,6 +760,12 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
     }
 
     textFile.Close();
+
+    // end the program if we are in quiet mode (no GUI shown)
+    if (m_doQuietMode)
+    {
+        this->Close();
+    }
 }
 
 void FlipMain::OnQuit(wxCommandEvent &event)
@@ -911,7 +930,6 @@ bool FlipMain::SetOutputFilename(const wxString &filename)
 
 bool FlipMain::SetSwitchAutoLAUNCH()
 {
-    LogMessage("we are in SetSwitchAutoLAUNCH");
     m_doAutoLAUNCH = true;
     return true;
 }
@@ -931,6 +949,12 @@ bool FlipMain::SetSwitchSWS()
 bool FlipMain::SetSwitchPages(const wxString &value)
 {
     m_ProcessPages->SetValue(value);
+    return true;
+}
+
+bool FlipMain::SetSwitchQuiet()
+{
+    m_doQuietMode = true;
     return true;
 }
 

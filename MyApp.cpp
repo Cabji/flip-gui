@@ -57,6 +57,7 @@ bool MyApp::OnInit()
             tempOut += "\tinput\t\t\tAbsolute or relative path to input filename\n";
             tempOut += "\toutput\t\t\tAbsolute or relative path to output filename\n";
             tempOut += "\tpage\t\t\tPage range to use (eg: 1-4 or 2,4,7,12)\n";
+            tempOut += "\tquiet\t\t\tNo GUI shown\n";
             tempOut += "\tsws\t\t\tN/A (Strip excessive whitspace from input data)\n";
             tempOut += "\ttemplate\t\tAbsolute or relative path to template filename\n";
         }
@@ -109,11 +110,24 @@ bool MyApp::OnInit()
             frame->SetSwitchAutoLAUNCH();
             // dev-note: if we set the switch for automated LAUNCH, we also must call frame->DoAutoLAUNCH(); further down to start the automatic processing
         }
-        // save program log perhaps?
+        else if (switchName == "quiet" || switchName == "q")
+        {
+            // dev-note: "quiet" mode will prevent the GUI from showing, NOT prevent output messages to console
+            tempOut += "  Switch set: -" + switchName + " (No GUI shown)\n";
+            frame->SetSwitchQuiet();
+        }
+        // switch for save program log perhaps?
+        else
+        {
+            tempOut += "  Unknown switch: " + switchName + "\n";
+        }
     }
 
     std::cout << tempOut << std::endl;
-    frame->Show(true);
+    if (!frame->GetSwitchValue("quiet"))
+    {
+        frame->Show(true);
+    }
     // dev-note: automated LAUNCH will only happen if frame->SetSwitchAutoLAUNCH() is called prior to this.
     frame->DoAutoLAUNCH();
 

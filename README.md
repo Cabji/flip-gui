@@ -28,16 +28,13 @@ If you want to build this project, you'll have to alter the CMakeLists.txt file 
 Here are some features I'd like to add eventually:
 
 ✔ Template Manager: add, remove, edit & validate template files
-
 ✔ Core PDF processing functionality (copy & paste from flip-cpp)
-
 ✔ Side-by-side Data Comparison: view the processed data side by side at each step of processing
-
 ✔ Stepped Data Processing: view the processed data after each regex is applied (filthy feature creep is happening)
-
 ✔ Output: output to CSV file on disk
+✔ Automation Support: add command line switches & flip-gui "automation" configuration support for fully automated PDF processing
 
-- Automation Support: add command line switches & flip-gui "automation" configuration support for fully automated PDF processing
+- Advanced Output: configurable output to allow user to define columns
 - Advanced Output: output into various formats locally (saved to file on disk), and maybe even output directly to networked locations/servers
 
 # Known Bugs

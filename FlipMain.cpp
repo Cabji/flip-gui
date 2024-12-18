@@ -38,7 +38,7 @@ FlipMain::FlipMain(wxWindow *parent, wxWindowID id, const wxString &title, const
       FLIP_USER_HOME_PATH(wxGetHomeDir()),
       FLIP_DEFAULT_CONFIG_PATH(wxGetHomeDir() + "/.flip"),
       FLIP_DEFAULT_TEMPLATE_PATH(wxGetHomeDir() + "/.flip/templates"),
-      FLIP_DEFAULT_OUTPUT_FILENAME("flipOutput.txt"),
+      FLIP_DEFAULT_OUTPUT_FILENAME("/Documents/flipOutput.txt"),
       m_startupArguments()
 {
     // dev-note: const class members must be declared in the constructor's initialiation list
@@ -387,7 +387,7 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     if (outputFilePath.IsEmpty())
     {
         // If no output file provided, use the default output path in the user's home directory
-        wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
+        wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + FLIP_DEFAULT_OUTPUT_FILENAME;
         outputFilePath = defaultOutputFilePath;
         NormalizeFilePathString(defaultOutputFilePath);
         m_tempOutput << problemCount++ << ". No output filename given, using default: " + defaultOutputFilePath + "\n";
@@ -693,7 +693,7 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
     // the Save button was clicked in the Data Viewer frame, user wants to save the content from the dataviewer
     // 1. Data Validation
     // If no output file provided, use the default output path in the user's home directory
-    wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + "/" + FLIP_DEFAULT_OUTPUT_FILENAME;
+    wxString defaultOutputFilePath = FLIP_USER_HOME_PATH + FLIP_DEFAULT_OUTPUT_FILENAME;
     wxString outFile = m_outputFile->GetTextCtrlValue();
     wxString outData = wxEmptyString;
     wxRegEx blankLineRegex("\n[\\s\\n]*$");

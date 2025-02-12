@@ -33,7 +33,7 @@ set(wxWidgets_INCLUDE_DIRS
 
 include_directories(
       $ENV{WXWIN}/include
-      $ENV{WXWIN}/lib/gcc_x64_lib/mswud
+      $ENV{WXWIN}/lib/${wx_LIB_BUILT_DIRNAME}/${wxWidgets_CONFIGURATION}
       )
 
 link_directories($ENV{WXWIN}/lib/gcc_x64_lib)

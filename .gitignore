@@ -1,2 +1,3 @@
 build/
 .vscode/
+local_config.cmake

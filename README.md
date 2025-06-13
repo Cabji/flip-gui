@@ -20,8 +20,18 @@ Flip, by itself is not very useful unless you have a _template_ file configured 
 
 # Building
 
-Use CMake. currently the provided CMake and config files are for my person machine which is Windows 11, using msys2 UCRT64 for the C++ STL, and wWidgets built statically on the local machine.
+Use CMake. currently the provided CMake and config files are for my person machine which is Windows 11, using msys2 UCRT64 for the C++ STL, and wWidgets built on the local machine.
 If you want to build this project, you'll have to alter the CMakeLists.txt file to point to where the relevant wxWidgets folders for your platform are and configure VSCode Cmake addon to know where needed includes are.
+
+My preferred method for 'installing' 3rd party libraries is: 
+
+    1. Install via pacman in msys2 UCRT64 terminal if possible OR
+    2. Download library sources and build locally
+        2a. 'Install' the library to C:/dev/cpp - NOT to its own random folder somewhere. Installing to a C++ development root location will put all of your locally built 3rd party library files into a development structure which makes it very easy to use into the future.
+
+Anything you install via MSYS2 pacman should get found by VSCode when you select the GCC kit for the project, and my CMakeLists.txt file is designed so that you point it to your development root folder and it should find any additionaly libraries you're using that you've built and installed locally. 
+
+wxWidgets has a few additional options that might need to be checked before you build so just work your way down the CMakeLists.txt file until it says you don't need to edit anything further down and adjust settings as/if needed.
 
 # Project Plans
 

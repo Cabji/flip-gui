@@ -760,7 +760,7 @@ void FlipMain::OnFlipDataViewerBtnSave(wxCommandEvent &event)
         LogMessage("Data successfully written to: " + outFile);
         if (!m_doQuietMode)
         {
-            wxMessageBox("File saved successfully!", "Success", wxICON_INFORMATION);
+            wxMessageBox("File saved successfully!\n\nSaved to: " + outFile, "Success", wxICON_INFORMATION);
         }
     }
     else

@@ -68,7 +68,7 @@ find_package(wxWidgets 3.2 COMPONENTS ${wxPackages} REQUIRED)
 include(${wxWidgets_USE_FILE} ${localCPPDevRoot}/include)
 
 # add sources to executable
-add_executable(${projectName} WIN32 ${SOURCES})
+add_executable(${projectName} ${SOURCES})
 
 target_include_directories(${projectName} PRIVATE ${wxWidgets_INCLUDE_DIRS})
 target_link_libraries(${projectName} ${wxWidgets_LIBRARIES} ${projectLibraries})

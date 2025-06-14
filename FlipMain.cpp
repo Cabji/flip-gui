@@ -325,30 +325,24 @@ void FlipMain::OnAbout(wxCommandEvent &event)
 void FlipMain::OnBtnLaunch(wxCommandEvent &event)
 {
     // Initialize local data & verify user input values
-    bool success = true;
-    std::set<int> processPages;
-    wxString templateFileAbsolutePath;
-    int problemCount = 1;
+    bool            success                     = true;
+    std::set<int>   processPages;
+    wxString        templateFileAbsolutePath;
+    int             problemCount                = 1;
+
     // reset class member data involved in this process to prevent any data accumulation
     m_vec_pdfData.clear();
     m_vec_pdfDataProcessed.clear();
     m_regexList.clear();
     m_currentRegex = 0;
+    
     // set continue processing buttton to be enabled if it's disabled
-    if (!m_dataViewer->GetBtnContinueProcessingAbility())
-    {
-        m_dataViewer->ToggleBtnContinueProcessingAbility();
-    }
+    if (!m_dataViewer->GetBtnContinueProcessingAbility()) {m_dataViewer->ToggleBtnContinueProcessingAbility();}
     // set Finish processing buttton to be enabled if it's disabled
-    if (!m_dataViewer->GetBtnFinishProcessingAbility())
-    {
-        m_dataViewer->ToggleBtnFinishProcessingAbility();
-    }
+    if (!m_dataViewer->GetBtnFinishProcessingAbility()) {m_dataViewer->ToggleBtnFinishProcessingAbility();}
     // set data viewer::save button to disabled if it enabled
-    if (m_dataViewer->GetBtnSaveAbility())
-    {
-        m_dataViewer->ToggleBtnSaveAbility();
-    }
+    if (m_dataViewer->GetBtnSaveAbility()) {m_dataViewer->ToggleBtnSaveAbility();}
+
     // 1. Validate m_inputFile (wxFilePickerCtrl)
     wxString inputFilePath = m_inputFile->GetPath();
     if (inputFilePath.IsEmpty())
@@ -526,6 +520,11 @@ void FlipMain::OnBtnLaunch(wxCommandEvent &event)
     {
         m_dataViewer->Show();
     }
+	else
+	{
+		// enable Save button in data viewer after automatic (non-user-stepped) processing
+		m_dataViewer->ToggleBtnSaveAbility();
+	}
 }
 
 void FlipMain::OnFlipDataViewerBtnContinueProcessing(wxCommandEvent &event)

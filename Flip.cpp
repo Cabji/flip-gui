@@ -266,7 +266,7 @@ DataViewer::DataViewer( wxWindow* parent, wxWindowID id, const wxString& title, 
 
 	m_dataviewerSizer->Add( m_btnFinishProcessing, wxGBPosition( 4, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
-	wxString m_saveFormatChoices[] = { _("CSV (text)") };
+	wxString m_saveFormatChoices[] = { _("CSV (text)"), _("SQLite (INSERT)"), _("SQLite (for UPSERT)") };
 	int m_saveFormatNChoices = sizeof( m_saveFormatChoices ) / sizeof( wxString );
 	m_saveFormat = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_saveFormatNChoices, m_saveFormatChoices, wxCB_SORT );
 	m_saveFormat->SetSelection( 0 );
